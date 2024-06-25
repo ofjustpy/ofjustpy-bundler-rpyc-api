@@ -1,0 +1,9 @@
+<script lang="ts">
+safe_tag_arr = [];
+let concString = safe_tag_arr.join('$twsty_str');
+
+
+</script>
+
+<div class={concString}></div>
+
