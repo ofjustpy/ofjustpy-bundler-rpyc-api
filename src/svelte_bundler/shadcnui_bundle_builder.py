@@ -1,4 +1,3 @@
-
 import paramiko
 import os
 import sys
@@ -46,6 +45,85 @@ app_postcss_template = Template("""
 @tailwind variants;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+ 
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+ 
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+ 
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+ 
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+ 
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+ 
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 216 34% 17%;
+ 
+    --radius: 0.5rem;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+
+@layer base {
 $font_config
 }
 """)
@@ -66,9 +144,13 @@ export const brands_iconMap = readable(brands_iconMap_dict);
 
 """)
 
+
+
+
+
 tailwind_config_ts_template = {}
+tailwind_config_ts_template['shadcnui'] = Template("""
 
-tailwind_config_ts_template['hyperui'] = Template("""
 import { join } from 'path';
 import type { Config } from 'tailwindcss';
 import forms from '@tailwindcss/forms';
@@ -77,101 +159,9 @@ import typography from '@tailwindcss/typography';
 import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
-   darkMode: 'class',
+   darkMode: ['class'],
    content: ['./src/**/*.{html,js,svelte,ts}',
-   ],
-   safelist: [],
-   theme: {
-   extend: {
-	   fontFamily: {$tw_ff_cfg}
-	   ,       
-	   fontWeight: {
-		   '100': 100,
-		   '200': 200,
-		   '300': 300,
-		   '400': 400,
-		   '500': 500,
-		   '600': 600,
-		   '700': 700,
-		   '800': 800,
-		   '900': 900,
-	   },
-   },
-},
-plugins: [
-	forms,
-	typography,
-]
-} satisfies Config;
-
-
-""")
-
-
-tailwind_config_ts_template['hyperui'] = Template("""
-import { join } from 'path';
-import type { Config } from 'tailwindcss';
-import forms from '@tailwindcss/forms';
-import plugin from 'tailwindcss/plugin';
-import typography from '@tailwindcss/typography';
-import { fontFamily } from "tailwindcss/defaultTheme";
-
-export default {
-   darkMode: 'class',
-   content: ['./src/**/*.{html,js,svelte,ts}',
-   ],
-   safelist: [],
-   theme: {
-   extend: {
-	   fontFamily: {$tw_ff_cfg}
-	   ,       
-	   fontWeight: {
-		   '100': 100,
-		   '200': 200,
-		   '300': 300,
-		   '400': 400,
-		   '500': 500,
-		   '600': 600,
-		   '700': 700,
-		   '800': 800,
-		   '900': 900,
-	   },
-   },
-},
-plugins: [
-	forms,
-	typography,
-]
-} satisfies Config;
-
-
-""")
-
-tailwind_config_ts_template["skeleton-shadcn-hyper"] = Template("""
-import { join } from 'path';
-import type { Config } from 'tailwindcss';
-import forms from '@tailwindcss/forms';
-import plugin from 'tailwindcss/plugin';
-import typography from '@tailwindcss/typography';
-import { skeleton } from '@skeletonlabs/tw-plugin';
-import { theme } from './src/theme';
-import { fontFamily } from "tailwindcss/defaultTheme";
-
-export default {
-   darkMode: 'class',
-   content: ['./src/**/*.{html,js,svelte,ts}',
-   './node_modules/@skeletonlabs/skeleton/dist/components/SlideToggle/SlideToggle.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/ListBox/ListBox.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/ListBox/ListBoxItem.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/ListBox/ListBoxItem.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/Tab/Tab.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/Tab/TabAnchor.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/Tab/TabGroup.svelte',
    './node_modules/bits-ui/dist/bits/**/*.{svelte, js, html, ts}',
-   join(import.meta.resolve('@skeletonlabs/skeleton'),
-   '../**/*.{html,js,svelte,ts}'),
-     join(import.meta.resolve('@skeletonlabs/tw-plugin'),
-   '../**/*.{html,js,svelte,ts}')
    ],
    safelist: [],
    theme: {
@@ -217,19 +207,6 @@ export default {
 			   DEFAULT: "hsl(var(--card) / <alpha-value>)",
 			   foreground: "hsl(var(--card-foreground) / <alpha-value>)",
 		   },
-		   magnum: {
-			   '50': '#fff9ed',
-			   '100': '#fef2d6',
-			   '200': '#fce0ac',
-			   '300': '#f9c978',
-			   '400': '#f7b155',
-			   '500': '#f38d1c',
-			   '600': '#e47312',
-			   '700': '#bd5711',
-			   '800': '#964516',
-			   '900': '#793a15',
-			   '950': '#411c09'
-		   }
 	   },
 	   borderRadius: {         
 		   lg: "var(--radius)",         
@@ -238,17 +215,7 @@ export default {
 	   },
 	   fontFamily: {$tw_ff_cfg
 	   },       
-	   fontWeight: {
-		   '100': 100,
-		   '200': 200,
-		   '300': 300,
-		   '400': 400,
-		   '500': 500,
-		   '600': 600,
-		   '700': 700,
-		   '800': 800,
-		   '900': 900,
-	   },
+
    }
 },
 plugins: [
@@ -267,48 +234,38 @@ plugins: [
 			{ values: theme('spacing') }
 		)
 	}),
-	skeleton({
-		themes: {
-			preset: ["skeleton", "wintry", "modern", "rocket", "seafoam", "vintage", "sahara", "crimson"]
-		}
-	})
+	
 ]
 } satisfies Config;
 """)
 
-
-
     
 local_script_path = "./build_bundle.sh"
 remote_script_path = "/tmp/build_bundle.sh"
-remote_files = ["/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js",
-                "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js.map",
-                "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/style.css"]  # List of remote files to SCP back
 local_destination_path = "/tmp"
 
-
+#bundler_dir = bundler_base_directory + "/" + ui_library
+bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Bundler_By_UI/shadcnui" 
 def build_bundle(twsty_str,
                  font_families=[],
                  fontawesome_icons = [],
-                 ui_library="hyperui",
+                 ui_library="shadcnui",
                  output_dir = "./"
                  ):
     """
-    ui_library_options: hyperui, skeletonui, shadcnui, hyperui+skeletonui, shadcnui+skeletonui, hyperui+shadcnui+skeletonui
+    ui_library_options: hyperui, 
     """
 
-    #bundler_dir = bundler_base_directory + "/" + ui_library
-    bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/" 
+
     with SSHClientManager(hostname, port, username) as ssh_client_manager:
         # Perform SSH operations using ssh_client
         ssh_client_manager.exec_command("delete bundle",
-                                        """cd /home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist
+                                        f"""cd {bundler_dir}/dist;
 
                                         rm bundler.iife.js bundler.iife.js.map style.css""")
 
         # ======================== TwSafelist ========================
         fontString = " ".join([f"font-{ff.lower()}" for ff in font_families])
-        print ("fontString = ", fontString)
         safelist_svelte_str = safelist_svelte_template.substitute(twsty_str=twsty_str,
                                                                   fontString=fontString
                                                                   )
@@ -325,6 +282,7 @@ def build_bundle(twsty_str,
 
         # ======================== app.postcss font config =======================
 
+        # directives to import fonts in app.postcss
         font_config = ""
 
         for font_family in font_families:

@@ -1,4 +1,3 @@
-
 import paramiko
 import os
 import sys
@@ -66,8 +65,11 @@ export const brands_iconMap = readable(brands_iconMap_dict);
 
 """)
 
+
+
+
+
 tailwind_config_ts_template = {}
-
 tailwind_config_ts_template['hyperui'] = Template("""
 import { join } from 'path';
 import type { Config } from 'tailwindcss';
@@ -106,187 +108,14 @@ plugins: [
 
 
 """)
-
-
-tailwind_config_ts_template['hyperui'] = Template("""
-import { join } from 'path';
-import type { Config } from 'tailwindcss';
-import forms from '@tailwindcss/forms';
-import plugin from 'tailwindcss/plugin';
-import typography from '@tailwindcss/typography';
-import { fontFamily } from "tailwindcss/defaultTheme";
-
-export default {
-   darkMode: 'class',
-   content: ['./src/**/*.{html,js,svelte,ts}',
-   ],
-   safelist: [],
-   theme: {
-   extend: {
-	   fontFamily: {$tw_ff_cfg}
-	   ,       
-	   fontWeight: {
-		   '100': 100,
-		   '200': 200,
-		   '300': 300,
-		   '400': 400,
-		   '500': 500,
-		   '600': 600,
-		   '700': 700,
-		   '800': 800,
-		   '900': 900,
-	   },
-   },
-},
-plugins: [
-	forms,
-	typography,
-]
-} satisfies Config;
-
-
-""")
-
-tailwind_config_ts_template["skeleton-shadcn-hyper"] = Template("""
-import { join } from 'path';
-import type { Config } from 'tailwindcss';
-import forms from '@tailwindcss/forms';
-import plugin from 'tailwindcss/plugin';
-import typography from '@tailwindcss/typography';
-import { skeleton } from '@skeletonlabs/tw-plugin';
-import { theme } from './src/theme';
-import { fontFamily } from "tailwindcss/defaultTheme";
-
-export default {
-   darkMode: 'class',
-   content: ['./src/**/*.{html,js,svelte,ts}',
-   './node_modules/@skeletonlabs/skeleton/dist/components/SlideToggle/SlideToggle.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/ListBox/ListBox.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/ListBox/ListBoxItem.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/ListBox/ListBoxItem.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/Tab/Tab.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/Tab/TabAnchor.svelte',
-   './node_modules/@skeletonlabs/skeleton/dist/components/Tab/TabGroup.svelte',
-   './node_modules/bits-ui/dist/bits/**/*.{svelte, js, html, ts}',
-   join(import.meta.resolve('@skeletonlabs/skeleton'),
-   '../**/*.{html,js,svelte,ts}'),
-     join(import.meta.resolve('@skeletonlabs/tw-plugin'),
-   '../**/*.{html,js,svelte,ts}')
-   ],
-   safelist: [],
-   theme: {
-   container: {
-	   center: true,
-	   padding: '2rem',
-	   screens: {
-		   '2xl': '1440px'
-	   }
-   },
-   extend: {
-	   colors: {
-		   border: "hsl(var(--border) / <alpha-value>)",
-		   input: "hsl(var(--input) / <alpha-value>)",
-		   ring: "hsl(var(--ring) / <alpha-value>)",
-		   background: "hsl(var(--background) / <alpha-value>)",
-		   foreground: "hsl(var(--foreground) / <alpha-value>)",
-		   primary: {
-			   DEFAULT: "hsl(var(--primary) / <alpha-value>)",
-			   foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
-		   },
-		   secondary: {
-			   DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
-			   foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
-		   },
-		   destructive: {
-			   DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
-			   foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
-		   },
-		   muted: {
-			   DEFAULT: "hsl(var(--muted) / <alpha-value>)",
-			   foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
-		   },
-		   accent: {
-			   DEFAULT: "hsl(var(--accent) / <alpha-value>)",
-			   foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
-		   },
-		   popover: {
-			   DEFAULT: "hsl(var(--popover) / <alpha-value>)",
-			   foreground: "hsl(var(--popover-foreground) / <alpha-value>)",
-		   },
-		   card: {
-			   DEFAULT: "hsl(var(--card) / <alpha-value>)",
-			   foreground: "hsl(var(--card-foreground) / <alpha-value>)",
-		   },
-		   magnum: {
-			   '50': '#fff9ed',
-			   '100': '#fef2d6',
-			   '200': '#fce0ac',
-			   '300': '#f9c978',
-			   '400': '#f7b155',
-			   '500': '#f38d1c',
-			   '600': '#e47312',
-			   '700': '#bd5711',
-			   '800': '#964516',
-			   '900': '#793a15',
-			   '950': '#411c09'
-		   }
-	   },
-	   borderRadius: {         
-		   lg: "var(--radius)",         
-		   md: "calc(var(--radius) - 2px)",         
-		   sm: "calc(var(--radius) - 4px)",       
-	   },
-	   fontFamily: {$tw_ff_cfg
-	   },       
-	   fontWeight: {
-		   '100': 100,
-		   '200': 200,
-		   '300': 300,
-		   '400': 400,
-		   '500': 500,
-		   '600': 600,
-		   '700': 700,
-		   '800': 800,
-		   '900': 900,
-	   },
-   }
-},
-plugins: [
-	forms,
-	typography,
-	plugin(function ({ addVariant, matchUtilities, theme }) {
-		addVariant('hocus', ['&:hover', '&:focus'])
-		// Square utility
-		matchUtilities(
-			{
-				square: (value) => ({
-					width: value,
-					height: value
-				})
-			},
-			{ values: theme('spacing') }
-		)
-	}),
-	skeleton({
-		themes: {
-			preset: ["skeleton", "wintry", "modern", "rocket", "seafoam", "vintage", "sahara", "crimson"]
-		}
-	})
-]
-} satisfies Config;
-""")
-
-
 
     
 local_script_path = "./build_bundle.sh"
 remote_script_path = "/tmp/build_bundle.sh"
-remote_files = ["/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js",
-                "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js.map",
-                "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/style.css"]  # List of remote files to SCP back
 local_destination_path = "/tmp"
 
-
+#bundler_dir = bundler_base_directory + "/" + ui_library
+bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Bundler_By_UI/hyperui" 
 def build_bundle(twsty_str,
                  font_families=[],
                  fontawesome_icons = [],
@@ -294,21 +123,19 @@ def build_bundle(twsty_str,
                  output_dir = "./"
                  ):
     """
-    ui_library_options: hyperui, skeletonui, shadcnui, hyperui+skeletonui, shadcnui+skeletonui, hyperui+shadcnui+skeletonui
+    ui_library_options: hyperui, 
     """
 
-    #bundler_dir = bundler_base_directory + "/" + ui_library
-    bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/" 
+
     with SSHClientManager(hostname, port, username) as ssh_client_manager:
         # Perform SSH operations using ssh_client
         ssh_client_manager.exec_command("delete bundle",
-                                        """cd /home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist
+                                        f"""cd {bundler_dir}/dist;
 
                                         rm bundler.iife.js bundler.iife.js.map style.css""")
 
         # ======================== TwSafelist ========================
         fontString = " ".join([f"font-{ff.lower()}" for ff in font_families])
-        print ("fontString = ", fontString)
         safelist_svelte_str = safelist_svelte_template.substitute(twsty_str=twsty_str,
                                                                   fontString=fontString
                                                                   )
@@ -325,6 +152,7 @@ def build_bundle(twsty_str,
 
         # ======================== app.postcss font config =======================
 
+        # directives to import fonts in app.postcss
         font_config = ""
 
         for font_family in font_families:
