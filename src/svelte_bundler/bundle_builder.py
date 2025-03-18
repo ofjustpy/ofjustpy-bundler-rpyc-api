@@ -281,9 +281,9 @@ plugins: [
     
 local_script_path = "./build_bundle.sh"
 remote_script_path = "/tmp/build_bundle.sh"
-remote_files = ["/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js",
-                "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js.map",
-                "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/style.css"]  # List of remote files to SCP back
+# remote_files = [f"/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js",
+#                 "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/bundle.iife.js.map",
+#                 "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Ofjustpy-Svelte-Tailwind-Skeleton-Bundler/dist/style.css"]  # List of remote files to SCP back
 local_destination_path = "/tmp"
 
 
