@@ -85,8 +85,7 @@ plugins: [
 
 
 #bundler_dir = bundler_base_directory + "/" + ui_library
-bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Bundler_By_UI/ssr"
-
+bundler_dir = f"{bundler_base_directory}/ssr" 
 def build_bundle(twsty_str,
                  font_families=[],
                  ui_library="ssr",
@@ -99,10 +98,10 @@ def build_bundle(twsty_str,
 
     with SSHClientManager(hostname, port, username) as ssh_client_manager:
         # Perform SSH operations using ssh_client
-        ssh_client_manager.exec_command("delete bundle",
-                                        f"""cd {bundler_dir}/dist;
+        # ssh_client_manager.exec_command("delete bundle",
+        #                                 f"""cd {bundler_dir}/dist;
 
-                                        rm bundler.iife.js bundler.iife.js.map style.css""")
+        #                                 rm bundler.iife.js bundler.iife.js.map style.css""")
 
         # ======================== TwSafelist ========================
         fontString = " ".join([f"font-{ff.lower()}" for ff in font_families])
@@ -164,7 +163,7 @@ def build_bundle(twsty_str,
 
 
         ssh_client_manager.exec_command("build bundle",
-                                        f"""cd {bundler_dir}
+                                        f"""cd {bundler_dir};
 
                                         npm run build""")
 

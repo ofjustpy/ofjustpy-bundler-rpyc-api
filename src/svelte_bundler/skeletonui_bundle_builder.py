@@ -39,10 +39,14 @@ let concString = safe_twsty_arr.join(' ');
                                    )
 
 app_postcss_template = Template("""
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
+@import "tailwindcss";
+@import '@skeletonlabs/skeleton';
+@source './node_modules/@skeletonlabs/skeleton-svelte/dist';
+@import '@skeletonlabs/skeleton/optional/presets';
+@import '@skeletonlabs/skeleton/themes/cerberus'; 
+@import '@skeletonlabs/skeleton/themes/mona'; 
+@import '@skeletonlabs/skeleton/themes/vox';
+
 
 @layer base {
 $font_config
@@ -89,9 +93,12 @@ export default {
    './node_modules/@skeletonlabs/skeleton/dist/components/Tab/Tab.svelte',
    './node_modules/@skeletonlabs/skeleton/dist/components/Tab/TabAnchor.svelte',
    './node_modules/@skeletonlabs/skeleton/dist/components/Tab/TabGroup.svelte',
+  './node_modules/@skeletonlabs/skeleton/dist/themes/mona.css',
    join(import.meta.resolve('@skeletonlabs/skeleton'),
+   '../**/*.{html,js,svelte,ts,css}'),
+   join(import.meta.resolve('@skeletonlabs/tw-plugin'),
    '../**/*.{html,js,svelte,ts}'),
-     join(import.meta.resolve('@skeletonlabs/tw-plugin'),
+join(import.meta.resolve('@skeletonlabs/skeleton-svelte'),
    '../**/*.{html,js,svelte,ts}')
    ],
    safelist: [],
@@ -117,7 +124,7 @@ plugins: [
 	typography,
 	skeleton({
 		themes: {
-			preset: ["skeleton", "wintry", "modern", "rocket", "seafoam", "vintage", "sahara", "hamlindigo", "gold-nouveau", "crimson"]
+			preset: ["skeleton", "wintry", "modern", "rocket", "seafoam", "vintage", "sahara", "hamlindigo", "gold-nouveau", "crimson", "mona"]
 		}
 	})
 ]
@@ -132,7 +139,7 @@ remote_script_path = "/tmp/build_bundle.sh"
 local_destination_path = "/tmp"
 
 #bundler_dir = bundler_base_directory + "/" + ui_library
-bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Bundler_By_UI/skeletonui" 
+bundler_dir = f"{bundler_base_directory}/skeletonui" 
 def build_bundle(twsty_str,
                  font_families=[],
                  fontawesome_icons = [],
@@ -149,7 +156,7 @@ def build_bundle(twsty_str,
         ssh_client_manager.exec_command("delete bundle",
                                         f"""cd {bundler_dir}/dist;
 
-                                        rm bundler.iife.js bundler.iife.js.map style.css""")
+                                        rm bundler.iife.js bundler.iife.js.map bundle.css""")
 
         # ======================== TwSafelist ========================
         fontString = " ".join([f"font-{ff.lower()}" for ff in font_families])
@@ -288,7 +295,7 @@ def build_bundle(twsty_str,
             pass
 
         try:
-            os.remove(f"{output_dir}/style.css")
+            os.remove(f"{output_dir}/bundle.css")
 
         except:
             pass
@@ -302,7 +309,7 @@ def build_bundle(twsty_str,
                                     f"{output_dir}/bundle.iife.js.map"
                                     )
 
-        ssh_client_manager.get_file(f"""{bundler_dir}/dist/style.css""",
+        ssh_client_manager.get_file(f"""{bundler_dir}/dist/bundle.css""",
                                     f"{output_dir}/style.css"
                                     )
 

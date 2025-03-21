@@ -115,7 +115,7 @@ remote_script_path = "/tmp/build_bundle.sh"
 local_destination_path = "/tmp"
 
 #bundler_dir = bundler_base_directory + "/" + ui_library
-bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Bundler_By_UI/hyperui" 
+bundler_dir = f"{bundler_base_directory}/hyperui" 
 def build_bundle(twsty_str,
                  font_families=[],
                  fontawesome_icons = [],
@@ -125,7 +125,7 @@ def build_bundle(twsty_str,
     """
     ui_library_options: hyperui, 
     """
-
+    bundler_dir = bundler_base_directory + "/" + ui_library
 
     with SSHClientManager(hostname, port, username) as ssh_client_manager:
         # Perform SSH operations using ssh_client

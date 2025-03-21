@@ -245,7 +245,7 @@ remote_script_path = "/tmp/build_bundle.sh"
 local_destination_path = "/tmp"
 
 #bundler_dir = bundler_base_directory + "/" + ui_library
-bundler_dir = "/home/kabiraatmonallabs/to_githubcodes/org-ofjustpy/Bundler_By_UI/shadcnui" 
+bundler_dir = f"{bundler_base_directory}/shadcnui" 
 def build_bundle(twsty_str,
                  font_families=[],
                  fontawesome_icons = [],

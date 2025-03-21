@@ -6,3 +6,7 @@ Dependencies
 ------------
 
 #. /home/kabiraatmonallabs/Development/Ofjustpy/py-tailwind-utils/font_bank
+
+
+#. ssr_bundle_builder
+   - fontawesome svg core is included by default
