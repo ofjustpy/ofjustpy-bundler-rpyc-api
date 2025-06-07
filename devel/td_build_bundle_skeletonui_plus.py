@@ -1,7 +1,8 @@
 import macropy.activate
 from svelte_safelist_builder import get_svelte_safelist
 
-twtags, fontawesome_icons = get_svelte_safelist("dummy_oj_webpage")
+twtags, fontawesome_icons = get_svelte_safelist("runner")
+print(twtags)
 font_families = ["Geist", "Roboto"]
 print(twtags)
 
@@ -15,8 +16,8 @@ skeletonui_bundle_builder(twtags,
                           skui_themes=["seafoam", "mint"],
                                     font_families=font_families,
                                     fontawesome_icons = fontawesome_icons,
-                                    output_dir="/home/kabiraatmonallabs/Development/Ofjustpy/ofjustpy-bundler-rpyc-api/devel/static/skeletonui_plus"
-                            
+                                    output_dir="/home/kabiraatmonallabs/Development/Ofjustpy/ofjustpy-bundler-rpyc-api/devel/static/skeletonui_plus",
+
                                     )
 
 
