@@ -41,7 +41,7 @@ let concString = safe_twsty_arr.join(' ');
 app_postcss_template = Template("""
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities;le
 @tailwind variants;
 
 @layer base {
