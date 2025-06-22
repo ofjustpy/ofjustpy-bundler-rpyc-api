@@ -10,7 +10,13 @@ from .config import (hostname,
                      bundler_base_directory
                      )
 
+def kebab_lower(label):
+    modstr = "".join(c if c.islower() else f"-{c.lower()}" for c in label[1:])
+    return f"""{label[0].lower()}{modstr}"""
 
+    
+
+                        
 import_preset_stmt = ""
 import_themes_stmt = ""
 include_tailwind_forms_stmt = ""
@@ -271,6 +277,89 @@ shadcn_neutral_theme_stmt = """
 
 """
 
+
+shadcn_component_map_stmt = ""
+shadcn_component_import_stmt = ""
+shadcn_component_render_src_template = Template("""
+<script lang="ts">
+  import { initComponentMapStore, addKVIdRef } from './store_componentMap.ts';
+    export let jp_props;
+  export let comp_ref;
+  import ComponentRenderByType from './ComponentRenderByType.svelte';
+  let other_ref = null;
+
+$shadcn_component_import_stmt
+    let components =  {
+                      $shadcn_component_map_stmt
+                       }
+
+    let myself_ref;
+
+  $$:if(comp_ref && jp_props.id !== undefined) myself_ref = comp_ref;
+  $$:if(comp_ref && jp_props.id !== undefined) {
+  addKVIdRef(jp_props.id, myself_ref);
+  console.log("adding schadcn to KVIdref");
+  console.log(jp_props.id);
+  console.log(myself_ref);
+  console.log(other_ref);
+  
+  
+  }
+
+  function eventHandlerWrapper(eventType) {
+    return function (event) {
+        if (jp_props.events.includes(eventType)) {
+        eventHandler_CSR(props, event, false);
+      }
+    };
+  }
+
+ function handleDoubleClick(event) {
+        //console.log("Double-clicked!");
+        
+        // You can perform additional actions here
+    }
+    
+  const eventHandlers = {
+    click: eventHandlerWrapper('click'),
+    change: eventHandlerWrapper('change'),
+    submit: eventHandlerWrapper('submit'),
+    mouseover: eventHandlerWrapper('mouseover'),
+    mouseenter: eventHandlerWrapper('mouseenter'),
+    mouseleave: eventHandlerWrapper('mouseleave'),
+    mouseout: eventHandlerWrapper('mouseout'),
+    dblclick: eventHandlerWrapper('dblclick'),
+  };
+  
+$$: descriptionObject = {
+    ...jp_props.attrs,
+    style: jp_props.style,
+    class: jp_props.classes, 
+  };
+
+export function updateTwClass(twClassStr){
+  descriptionObject.class=twClassStr;
+  console.log("updating shadcn component : ", jp_props.html_tag);
+  console.log(twClassStr);
+}
+
+  
+
+
+
+</script>
+
+<svelte:component this={components[jp_props.html_tag]} {...descriptionObject} bind:this={other_ref}>
+{#if jp_props.text}{jp_props.text}{/if}
+  {#each jp_props.object_props as cobj_props}
+    {#if cobj_props.show}
+      <svelte:component this={ComponentRenderByType} jp_props={cobj_props}/>
+    {/if}
+  {/each}
+{#if jp_props.inner_html}{@html jp_props.inner_html}{/if}
+  </svelte:component>
+
+""")
 preset_themes = [
     "catppuccin", "cerberus", "concord", "crimson", "fennec",
     "hamlindigo", "legacy", "mint", "modern", "mona",
@@ -278,6 +367,8 @@ preset_themes = [
     "rose", "sahara", "seafoam", "terminus", "vintage",
     "vox", "wintry"
 ]
+
+
 
 bundler_dir = f"{bundler_base_directory}/skeletonui_with_shadcnui" 
 def build_bundle(twsty_str,
@@ -287,7 +378,8 @@ def build_bundle(twsty_str,
                  output_dir = "./",
                  use_tailwind_forms = True,
                  skui_themes = ["crimson"],
-                 
+                 shadcn_components = [],
+                 shadcn_components_parts = [],
                  skui_preset_import = True,
                  shadcn_theme = "neutral"
                  ):
@@ -332,7 +424,63 @@ def build_bundle(twsty_str,
         app_css_temp_file.write(app_css_str)
         print(f"Data written to temporary file: {app_css_temp_file.name}")
 
+
+    # ShadcnComponent.svelte
+    all_map_stmts = []
+    for shadcn_comp, shadcn_comp_part in shadcn_components_parts:
+        print(shadcn_comp, " ==> ", shadcn_comp_part)
+        if shadcn_comp_part is None:
+            all_map_stmts.append(f"{shadcn_comp.lower()} : {shadcn_comp}")
+                        
+        else:
+            all_map_stmts.append(f"{shadcn_comp.lower()}_{shadcn_comp_part.lower()} : {shadcn_comp}.{shadcn_comp_part}")
+
+    # component_map_body = ",\n ".join(f"{shadcn_comp.lower()}_{shadcn_comp_part.lower()} : {shadcn_comp}.{shadcn_comp_part}" for shadcn_comp, shadcn_comp_part in shadcn_components_parts
+
+    # )
+    component_map_body = ",\n ".join(all_map_stmts
+
+    )
+
+    def is_subpart_none(comp_label):
+        """
+        components like Badge .. do not have subpart;
         
+        
+        """
+        for comp_label, comp_subpart in shadcn_components_parts:
+            if comp_label == comp:
+                if comp_subpart == None:
+                    return True
+
+        return False
+    all_component_import_stmts = []
+    for comp in shadcn_components:
+        if is_subpart_none(comp):
+            all_component_import_stmts.append(f"""import {{ {comp} }} from "$lib/components/ui/{comp.lower()}/index.js";"""
+            
+
+                                              )
+        else:
+            all_component_import_stmts.append(f"""import * as  {comp}  from "$lib/components/ui/{kebab_lower(comp)}/index.js";""")
+        
+                    
+        pass
+    # component_import_body = "\n". join(f"""import * as  {comp}  from "$lib/components/ui/{kebab_lower(comp)}/index.js";""" for comp in shadcn_components)
+
+    component_import_body = "\n".join(all_component_import_stmts
+        )
+    print ("component_map_body = ", component_map_body)
+    print ("component_map_body = ", component_import_body)
+
+    with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.svelte') as shadcn_component_render_temp_file:
+        shadcn_component_render_temp_file.write(shadcn_component_render_src_template.substitute(shadcn_component_map_stmt = component_map_body,
+                                                                                                shadcn_component_import_stmt = component_import_body
+
+                                                                                                )
+                                                )
+        
+
     with SSHClientManager(hostname, port, username) as ssh_client_manager:
         ssh_client_manager.put_file(temp_file.name,
                                     f"{bundler_dir}/safelist.txt")
@@ -341,14 +489,40 @@ def build_bundle(twsty_str,
         ssh_client_manager.put_file(app_css_temp_file.name,
                                     f"{bundler_dir}/src/app.css")
 
+        # Install ShadcnComponent.svelte
+        
+        ssh_client_manager.put_file(shadcn_component_render_temp_file.name,
+                                    f"{bundler_dir}/src/ShadcnComponent.svelte")
+
+        
         ssh_client_manager.exec_command("delete bundle",
                                         f"""cd {bundler_dir}/dist;
 
                                         rm bundler.iife.js bundle.css""")
 
-        ssh_client_manager.exec_command("build bundle",
-                                        f"""cd {bundler_dir}
+        # install  shadcn components
 
+        ssh_client_manager.exec_command("remove existing shadcn components",
+                                        f"""cd {bundler_dir}; 
+
+                                        rm -rf src/lib/components/ui/* """)
+
+        if len(shadcn_components) > 0:
+
+            
+            shadcn_components_install_cmd  = " ".join([ kebab_lower(comp)  for comp in shadcn_components]
+                                                      )
+            print ("shadcn_components_install_cmd = ", shadcn_components_install_cmd)
+            
+            ssh_client_manager.exec_command("install shadcn components",
+                                            f"""cd {bundler_dir}; export PATH=/home/kabiraatmonallabs/.nvm/versions/node/v24.2.0/bin:$PATH;
+
+                                        pnpm dlx shadcn-svelte@latest add {shadcn_components_install_cmd} --yes """)
+
+
+
+        ssh_client_manager.exec_command("build bundle",
+                                        f"""cd {bundler_dir}; export PATH=/home/kabiraatmonallabs/.nvm/versions/node/v24.2.0/bin:$PATH;
                                         npm run build""")
 
         try:
@@ -366,6 +540,8 @@ def build_bundle(twsty_str,
 
         except:
             pass
+
+        
         ssh_client_manager.get_file(f"""{bundler_dir}/dist/bundle.iife.js""",
                                     f"{output_dir}/bundle.iife.js"
                                     )

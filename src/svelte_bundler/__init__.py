@@ -4,3 +4,5 @@ from .hyperui_bundle_builder  import build_bundle as hyperui_bundle_builder
 from .shadcnui_bundle_builder  import build_bundle as shadcnui_bundle_builder
 from .ssr_bundle_builder  import build_bundle as ssr_bundle_builder
 from .all_in_one_bundle_builder import build_bundle as all_in_one_bundle_builder
+
+from .shadcnui_patch_hooks import list_imported_components_in_module as list_shadcn_components_in_module

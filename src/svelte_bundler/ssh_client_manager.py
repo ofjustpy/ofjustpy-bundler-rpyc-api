@@ -81,7 +81,7 @@ class SSHClientManager:
 
     def exec_command(self, cmd_desc, command, ):
         try:
-            print ("Now executing command ", cmd_desc)
+            print ("Now executing command ", cmd_desc, " ", command)
             stdin, stdout, stderr = self.ssh_client.exec_command(command, timeout=420)
             
             for line in stdout:
