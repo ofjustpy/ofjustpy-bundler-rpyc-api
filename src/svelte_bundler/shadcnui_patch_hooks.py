@@ -93,6 +93,7 @@ def list_imported_components_in_module(mod_name,
          patch('shadcnui_components.Badge', new=ShadcnWrapper(shadcnui_components.components.Badge)), \
          patch('shadcnui_components.Breadcrumb', new=ShadcnWrapper(shadcnui_components.components.Breadcrumb)), \
          patch('shadcnui_components.Collapsible', new=ShadcnWrapper(shadcnui_components.components.Collapsible)), \
+         patch('shadcnui_components.ContextMenu', new=ShadcnWrapper(shadcnui_components.components.ContextMenu)), \
          patch('shadcnui_components.Command', new=ShadcnWrapper(shadcnui_components.components.Command)), \
          patch('shadcnui_components.Dialog', new=ShadcnWrapper(shadcnui_components.Dialog)), \
          patch('shadcnui_components.Drawer', new=ShadcnWrapper(shadcnui_components.Drawer)), \
@@ -100,15 +101,15 @@ def list_imported_components_in_module(mod_name,
          patch('shadcnui_components.DropdownMenu', new=ShadcnWrapper(shadcnui_components.DropdownMenu)), \
          patch('shadcnui_components.HoverCard', new=ShadcnWrapper(shadcnui_components.HoverCard)), \
          patch('shadcnui_components.Menubar', new=ShadcnWrapper(shadcnui_components.Menubar)), \
+         patch('shadcnui_components.NavigationMenu', new=ShadcnWrapper(shadcnui_components.NavigationMenu)), \
+         patch('shadcnui_components.Popover', new=ShadcnWrapper(shadcnui_components.Popover)), \
          patch('shadcnui_components.Pagination', new=ShadcnWrapper(shadcnui_components.Pagination)), \
          patch('shadcnui_components.Progress', new=ShadcnWrapper(shadcnui_components.Progress)), \
          patch('shadcnui_components.RadioGroup', new=ShadcnWrapper(shadcnui_components.RadioGroup)), \
          patch('shadcnui_components.Resizable', new=ShadcnWrapper(shadcnui_components.Resizable)), \
          patch('shadcnui_components.ScrollArea', new=ShadcnWrapper(shadcnui_components.ScrollArea)), \
-         patch('shadcnui_components.Separator', new=ShadcnWrapper(shadcnui_components.Separator)), \
-         patch('shadcnui_components.Sheet', new=ShadcnWrapper(shadcnui_components.Sheet)), \
-         patch('shadcnui_components.Skeleton', new=ShadcnWrapper(shadcnui_components.Skeleton)), \
-         patch('shadcnui_components.Slider', new=ShadcnWrapper(shadcnui_components.Slider)):
+         patch('shadcnui_components.Separator', new=ShadcnWrapper(shadcnui_components.Separator)):
+
         
         target_mod = importlib.import_module(mod_name)
 
@@ -117,7 +118,10 @@ def list_imported_components_in_module(mod_name,
         if dep_mod in sys.modules:
             del sys.modules[dep_mod]
         
-    with patch('shadcnui_components.Switch', new=ShadcnWrapper(shadcnui_components.Switch)), \
+    with patch('shadcnui_components.Sheet', new=ShadcnWrapper(shadcnui_components.Sheet)), \
+         patch('shadcnui_components.Skeleton', new=ShadcnWrapper(shadcnui_components.Skeleton)), \
+         patch('shadcnui_components.Switch', new=ShadcnWrapper(shadcnui_components.Switch)), \
+         patch('shadcnui_components.Slider', new=ShadcnWrapper(shadcnui_components.Slider)), \
          patch('shadcnui_components.Table', new=ShadcnWrapper(shadcnui_components.Table)), \
          patch('shadcnui_components.Avatar', new=ShadcnWrapper(shadcnui_components.Avatar)), \
          patch('shadcnui_components.Tabs', new=ShadcnWrapper(shadcnui_components.Tabs)), \
@@ -128,11 +132,21 @@ def list_imported_components_in_module(mod_name,
          patch('shadcnui_components.Calendar', new=ShadcnWrapper(shadcnui_components.Calendar)), \
          patch('shadcnui_components.Carousel', new=ShadcnWrapper(shadcnui_components.Carousel)), \
          patch('shadcnui_components.Card', new=ShadcnWrapper(shadcnui_components.Card)), \
-         patch('shadcnui_components.Checkbox', new=ShadcnWrapper(shadcnui_components.Checkbox)), \
-         patch('shadcnui_components.Input', new=ShadcnWrapper(shadcnui_components.Input)), \
-         patch('shadcnui_components.Select', new=ShadcnWrapper(shadcnui_components.Select)):
+         patch('shadcnui_components.Checkbox', new=ShadcnWrapper(shadcnui_components.Checkbox)
+               ):
 
         
+        
+        target_mod = importlib.import_module(mod_name)
+         
+    del sys.modules[mod_name]
+    for dep_mod in dep_modules:
+        if dep_mod in sys.modules:
+            del sys.modules[dep_mod]
+
+    
+    with patch('shadcnui_components.Select', new=ShadcnWrapper(shadcnui_components.Select)),\
+         patch('shadcnui_components.Input', new=ShadcnWrapper(shadcnui_components.Input)):
         target_mod = importlib.import_module(mod_name)
         
     return all_shadcn_components, all_shadcn_components_parts

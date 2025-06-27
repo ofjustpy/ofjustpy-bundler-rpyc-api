@@ -457,7 +457,7 @@ def build_bundle(twsty_str,
     all_component_import_stmts = []
     for comp in shadcn_components:
         if is_subpart_none(comp):
-            all_component_import_stmts.append(f"""import {{ {comp} }} from "$lib/components/ui/{comp.lower()}/index.js";"""
+            all_component_import_stmts.append(f"""import {{ {comp} }} from "$lib/components/ui/{kebab_lower(comp)}/index.js";"""
             
 
                                               )
@@ -520,10 +520,9 @@ def build_bundle(twsty_str,
                                         pnpm dlx shadcn-svelte@latest add {shadcn_components_install_cmd} --yes """)
 
 
-
         ssh_client_manager.exec_command("build bundle",
                                         f"""cd {bundler_dir}; export PATH=/home/kabiraatmonallabs/.nvm/versions/node/v24.2.0/bin:$PATH;
-                                        npm run build""")
+                                        pnpm run build""")
 
         try:
             os.remove(f"{output_dir}/bundle.iife.js")
