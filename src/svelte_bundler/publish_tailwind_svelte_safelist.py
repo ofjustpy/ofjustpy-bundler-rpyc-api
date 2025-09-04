@@ -24,12 +24,7 @@ def publish_tailwind_svelte_safelist(target_module,
                  dep_modules,
 
                  ):
-
-
-    with SSHClientManager(hostname, port, username) as ssh_client_manager:
-        runtime_context.ssh_client_manager = ssh_client_manager
-
-        twtags, fontawesome_icons = get_svelte_safelist(target_module)
-        print(twtags)
-        publish_tailwind_svelte_safelist_impl(twtags)
-    pass
+    twtags, fontawesome_icons = get_svelte_safelist(target_module)
+    print("tailwind tags = ", twtags)
+    publish_tailwind_svelte_safelist_impl(twtags)
+    
