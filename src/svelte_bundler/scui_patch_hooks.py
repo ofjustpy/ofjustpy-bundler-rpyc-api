@@ -123,7 +123,6 @@ def list_shadcn_components_in_module(mod_name,
          patch('shadcnui_components.Sheet', new=ShadcnWrapper(shadcnui_components.Sheet)), \
          patch('shadcnui_components.Skeleton', new=ShadcnWrapper(shadcnui_components.Skeleton)), \
          patch('shadcnui_components.Switch', new=ShadcnWrapper(shadcnui_components.Switch)), \
-         patch('shadcnui_components.Slider', new=ShadcnWrapper(shadcnui_components.Slider)), \
          patch('shadcnui_components.Table', new=ShadcnWrapper(shadcnui_components.Table)), \
          patch('shadcnui_components.Avatar', new=ShadcnWrapper(shadcnui_components.Avatar)), \
          patch('shadcnui_components.Tabs', new=ShadcnWrapper(shadcnui_components.Tabs)), \
@@ -131,7 +130,6 @@ def list_shadcn_components_in_module(mod_name,
          patch('shadcnui_components.Label', new=ShadcnWrapper(shadcnui_components.Label)), \
          patch('shadcnui_components.Tooltip', new=ShadcnWrapper(shadcnui_components.Tooltip)), \
          patch('shadcnui_components.Accordion', new=ShadcnWrapper(shadcnui_components.Accordion)), \
-         patch('shadcnui_components.Calendar', new=ShadcnWrapper(shadcnui_components.Calendar)), \
          patch('shadcnui_components.Carousel', new=ShadcnWrapper(shadcnui_components.Carousel)), \
          patch('shadcnui_components.Card', new=ShadcnWrapper(shadcnui_components.Card)), \
          patch('shadcnui_components.Chart', new=ShadcnWrapper(shadcnui_components.Chart)), \

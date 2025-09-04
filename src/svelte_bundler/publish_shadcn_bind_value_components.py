@@ -1,9 +1,10 @@
 import sys
+import ofjustpy as oj
 import importlib
 from string import Template
 from .helper_utils import write_to_bundler_dir, kebab_lower
 from .config import bundler_dir, node_bin_path
-from .scui_patch_hooks import list_shadcn_components_in_module
+from .scui_bind_value_patch_hooks import list_shadcn_components_in_module
 
 shadcn_component_map_stmt = ""
 shadcn_component_import_stmt = ""
@@ -12,7 +13,8 @@ component_render_src_template = Template("""
 <script lang="ts">
   import { initComponentMapStore, addKVIdRef } from './store_componentMap.ts';
   import ComponentRenderByType from './ComponentRenderByType.svelte';
-
+  import { componentValues } from './store_shadcn_bindvalue.ts';
+ import { getLocalTimeZone, today } from "@internationalized/date";
 $shadcn_component_import_stmt
 $import_var_stmts
 let { jp_props, comp_ref } = $$props();
@@ -77,7 +79,23 @@ export function updateTwClass(twClassStr){
   console.log(twClassStr);
 }
 
-let value = $state("to-be-decided")
+let cid = jp_props.id;
+console.log("cid = ", cid)
+//let value = $$state($$componentValues[cid]);
+const start = today(getLocalTimeZone());
+const end = start.add({ days: 7 });
+
+let value = $$state({
+    start,
+    end
+  });
+
+//let value =  {    start: new CalendarDate(2025, 2, 10),     end: new CalendarDate(2025, 2, 17)    };
+
+
+$$effect(() => {
+    console.log("The current value for", cid, "is:", value);
+  });
 
 let Component = components[jp_props.html_tag];
 
@@ -115,24 +133,80 @@ $$effect(() => {
 
 """)
 
+bindvalue_store_template = Template("""
+import { writable } from 'svelte/store';
+$bindvalue_import_jsstr
+/**
+ * A type definition for the state object.
+ * Using `any` allows for storing mixed value types like strings, numbers, or Date objects,
+ * which is flexible for different kinds of components.
+ */
+
+
+type ComponentValueState = {
+  [key: string]: any;
+};
+
+/**
+ * Note: `today(getLocalTimeZone())` is a function typically found in date libraries
+ * like `@internationalized/date`, commonly used with Svelte component libraries.
+ * For this standalone example, we'll use a standard JavaScript `new Date()` object
+ * to represent the same concept.
+ */
+const initialValues: ComponentValueState = {
+ $bindvalue_map_jsstr
+};
+
+/**
+ * A writable Svelte store that holds the state for multiple components.
+ * Each component's state is keyed by its unique ID.
+ * This store can be imported into any component to read or write values.
+ */
+export const componentValues = writable<ComponentValueState>(initialValues);
+
+
+""")
 
 
 
-import jsexprs.macro_module as jsexprs_mm    
-def publish_shadcn_component_render_svelte(target_module,
+
+def publish_shadcn_bind_value_component_render_svelte(target_module,
                                            dep_modules,
+                                                      import_var_stmts,
                                            ssh_client_manager):
     #install shadcn
+
+
+
+    shadcn_components, shadcn_components_parts, bind_value_map = list_shadcn_components_in_module(target_module, dep_modules)
     
+    print("shadcn_components = ", shadcn_components)
 
 
-    shadcn_components, shadcn_components_parts = list_shadcn_bind_value_components_in_module(target_module, dep_modules)
+    # build the svelte/javascript store for bind values
+    all_bindvalue_map_items = []
+    all_bindvalue_import_stmts = []
+    for cid, value in bind_value_map.items():
+        if isinstance(value, oj.JSExpr):
+            all_bindvalue_map_items.append(f"'{cid}': {value.expr}")
+            all_bindvalue_import_stmts.extend(value.import_stmts)
+            pass
+        else:
+            all_bindvalue_map_items.append(f"'{cid}': {value}")
+            pass
+
+
+    bindvalue_map_jsstr = ",\n ".join(all_bindvalue_map_items)
+    bindvalue_import_jsstr = "\n".join(set(all_bindvalue_import_stmts))
+    bindvalue_store_jsstr = bindvalue_store_template.substitute(bindvalue_map_jsstr = bindvalue_map_jsstr,
+                                                                bindvalue_import_jsstr = bindvalue_import_jsstr
+                                                                )
+    
+    
+    write_to_bundler_dir(bindvalue_store_jsstr,
+                         "src/store_shadcn_bindvalue.ts")        
     if len(shadcn_components) == 0:
-        return 
-
-
-
-
+        return False
     shadcn_components_install_cmd  = " ".join([ kebab_lower(comp)  for comp in shadcn_components]
                                               )
 
@@ -187,74 +261,18 @@ def publish_shadcn_component_render_svelte(target_module,
     print ("component_map_body = ", component_import_body)
 
 
-    shadcn_component_render_src_str = shadcn_component_render_src_template.substitute(shadcn_component_map_stmt = component_map_body,
+    shadcn_component_render_src_str = component_render_src_template.substitute(shadcn_component_map_stmt = component_map_body,
                                                                                                 shadcn_component_import_stmt = component_import_body,
                                                                                       import_var_stmts = import_var_stmts
                                                                                                 )
 
 
-    shadcn_bind_value_component_render_src_template.substitute(shadcn_component_map_stmt = component_map_body,
-                                                                                                shadcn_component_import_stmt = component_import_body,
-                                                                                      import_var_stmts = import_var_stmts,
-                                                               bind_var_label=bind_var_label,
-                                                               
 
-        )
     write_to_bundler_dir(shadcn_component_render_src_str,
                          "src/ShadcnBindValueComponent.svelte")
     
 
-    
+    return True
 
 
 
-# from unittest.mock import patch
-# import importlib
-# import shadcnui_components
-# import shadcnui_components as SCUI
-# import sys
-# import inspect
-# from shadcnui_components.components import BindValueMixin
-
-
-    
-# def publish_shadcn_bind_value_components(mod_name,
-#                                        dep_modules):
-#     class ShadcnWrapper:
-#         def __init__(self, original_component):
-#             self._original = original_component
-#             self.gen_component_description = False
-#             self.needs_bind_value_component = False
-#             if inspect.isfunction(original_component):
-#                 id_assigner_func = original_component.__closure__[0].cell_contents
-#                 comp_class = id_assigner_func.__closure__[0].cell_contents
-            
-#             elif inspect.isclass(original_component):
-#                 comp_class = original_component
-
-
-#             if issubclass(comp_class, BindValueMixin):
-#                 self.needs_bind_value_component = True
-
-#         def __call__(self, *args, **kwargs):
-#             res =  self._original(*args, **kwargs)
-#             if self.needs_bind_value_component:
-#                 res.
-
-
-            
-#             return res
-#         def __getattr__(self, name):
-#             assert False
-
-
-#     if mod_name in sys.modules:
-#         del sys.modules[mod_name]
-
-#     for dep_mod in dep_modules:
-#         if dep_mod in sys.modules:
-#             del sys.modules[dep_mod]
-        
-#     with patch('shadcnui_components.Alert', new=ShadcnWrapper(shadcnui_components.components.Alert)), \
-#                   patch('shadcnui_components.Slider', new=ShadcnWrapper(shadcnui_components.Slider)):
-#         target_mod = importlib.import_module(mod_name)

@@ -229,9 +229,11 @@ $$effect(() => {
 
 
 
-import jsexprs.macro_module as jsexprs_mm    
+
 def publish_shadcn_component_render_svelte(target_module,
+                                           
                                            dep_modules,
+                                           import_var_stmts,
                                            ssh_client_manager):
     #install shadcn
     
@@ -244,17 +246,7 @@ def publish_shadcn_component_render_svelte(target_module,
 
     # TODO: ComponentRenderByType
 
-    import_var_stmts = ""
-    #import directives
-    # import_stmts = []
-    # #target_mod = importlib.import_module(target_module)
-    # for import_directive in jsexprs_mm.import_var_stmts:
-    #     variable_str = import_directive['var_label']
-    #     module_name = import_directive['module']
-    #     statement = f'import {{ {variable_str} }} from "{module_name}";'
-    #     import_stmts.append(statement)
-
-    # import_var_stmts = "\n".join(import_stmts)
+    
     # print("import stmts = ", import_stmts)
 
     # if target_module in sys.modules:
@@ -273,7 +265,7 @@ def publish_shadcn_component_render_svelte(target_module,
     shadcn_components, shadcn_components_parts = list_shadcn_components_in_module(target_module, dep_modules)
     print("shadcn_components = ", shadcn_components)
     if len(shadcn_components) == 0:
-        return 
+        return False
 
 
 
@@ -342,13 +334,8 @@ def publish_shadcn_component_render_svelte(target_module,
                                                                                                 )
 
 
-    shadcn_bind_value_component_render_src_template.substitute(shadcn_component_map_stmt = component_map_body,
-                                                                                                shadcn_component_import_stmt = component_import_body,
-                                                                                      import_var_stmts = import_var_stmts,
-                                                               bind_var_label=bind_var_label,
-                                                               
 
-        )
     write_to_bundler_dir(shadcn_component_render_src_str,
                          "src/ShadcnComponent.svelte")
     
+    return True

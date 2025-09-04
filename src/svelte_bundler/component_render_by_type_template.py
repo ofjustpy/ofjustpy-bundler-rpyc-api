@@ -2,12 +2,9 @@ from string import Template
 component_render_by_type_template = Template("""
 <script lang="ts">
    import Htmlcomponents from './Htmlcomponents.svelte';
-   import ShadcnComponent from './ShadcnComponent.svelte';
-   import ShadcnComponentBindValue from './ShadcnComponentBindValue.svelte';
-   
+   $component_import_jsstr
    let components = { 'html_component': Htmlcomponents,
-                       'shadcnui_component': ShadcnComponent,
-                       'shadcnui_bind_value_component': ShadcnComponentBindValue
+                       $component_map_jsstr
 
                     }
                     ;
@@ -21,17 +18,17 @@ component_render_by_type_template = Template("""
 <svelte:component this={components[jp_props.vue_type]} bind:this={comp_ref} jp_props={jp_props} comp_ref={comp_ref}  />
 
 """
-
     )
 
 component_render_by_type_str = """
 <script lang="ts">
    import Htmlcomponents from './Htmlcomponents.svelte';
    import ShadcnComponent from './ShadcnComponent.svelte';
-   
+import ShadcnComponentBindValue from './ShadcnBindValueComponent.svelte';
    
    let components = { 'html_component': Htmlcomponents,
                        'shadcnui_component': ShadcnComponent,
+'shadcnui_bind_value_component': ShadcnComponentBindValue
 
                     }
                     ;
@@ -43,6 +40,7 @@ component_render_by_type_str = """
 </script>
 
 <svelte:component this={components[jp_props.vue_type]} bind:this={comp_ref} jp_props={jp_props} comp_ref={comp_ref}  />
+
 
 """
 
@@ -51,11 +49,12 @@ component_render_by_type_str = """
 from .helper_utils import write_to_bundler_dir
 
 def publish_component_render_by_type(enable_svg_components=False,
-                 enable_fontawesome_components = False,
-                 enable_shadcn_components = True,
-                 enable_skeleton_components = False,
-                 enable_lucide_components = False,
-                 enable_shadcn_layerchart_components=False):
+                                     enable_fontawesome_components = False,
+                                     enable_shadcn_components = True,
+                                     enable_shadcn_bindvalue_components = False,
+                                     enable_skeleton_components = False,
+                                     enable_lucide_components = False,
+                                     enable_shadcn_layerchart_components=False):
     component_map_stmts = []
     component_import_stmts = []
     if enable_svg_components:
@@ -65,5 +64,17 @@ def publish_component_render_by_type(enable_svg_components=False,
     if enable_shadcn_components:
         component_map_stmts.append("'shadcnui_component': ShadcnComponent")
         component_import_stmts.append("import ShadcnComponent from './ShadcnComponent.svelte';")
-        
+
+    if enable_shadcn_bindvalue_components:
+        component_map_stmts.append("'shadcnui_bind_value_component': ShadcnComponentBindValue")
+        component_import_stmts.append("import ShadcnComponentBindValue from './ShadcnBindValueComponent.svelte';")
+
+
+
+    component_import_jsstr = "\n".join(component_import_stmts)
+    component_map_jsstr = "\n".join(component_map_stmts)
+
+    component_render_by_type_str = component_render_by_type_template.substitute(component_map_jsstr = component_map_jsstr,
+                                                 component_import_jsstr = component_import_jsstr
+                                                 )
     write_to_bundler_dir(component_render_by_type_str , "src/ComponentRenderByType.svelte")

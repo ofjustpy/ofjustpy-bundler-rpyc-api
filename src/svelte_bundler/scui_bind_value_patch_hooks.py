@@ -14,6 +14,10 @@ def list_shadcn_components_in_module(mod_name,
     print("in list_shadcn_components_in_module")
     all_shadcn_components = set()
     all_shadcn_components_parts = set()
+    # map from component id
+    # to javascript expression of
+    # its value
+    bind_value_map = {}
     class ShadcnWrapper:
         def __init__(self, original_component):
             self._original = original_component
@@ -55,7 +59,16 @@ def list_shadcn_components_in_module(mod_name,
                 assert False
 
         def __call__(self, *args, **kwargs):
+            
+            assert 'value' in kwargs
+
+            jsexpr_value = kwargs.pop('value')
+
             res =  self._original(*args, **kwargs)
+            id = res.id
+            
+            print(f"got value for id = {id} : ", jsexpr_value)
+            bind_value_map[id] = jsexpr_value
             base_class = res.__class__.__bases__[0]
             all_shadcn_components.add(base_class.__name__)
             all_shadcn_components_parts.add((base_class.__name__, None))
@@ -77,7 +90,7 @@ def list_shadcn_components_in_module(mod_name,
         if dep_mod in sys.modules:
             del sys.modules[dep_mod]
         
-    with patch('shadcnui_components.bind_value_components.Slider', new=ShadcnWrapper(shadcnui_components.bind_value_components.Slider)):
+    with patch('shadcnui_components.Calendar', new=ShadcnWrapper(shadcnui_components.Calendar)), patch('shadcnui_components.RangeCalendar', new=ShadcnWrapper(shadcnui_components.RangeCalendar)), patch('shadcnui_components.Slider', new=ShadcnWrapper(shadcnui_components.Slider)):
 
         
         target_mod = importlib.import_module(mod_name)
@@ -88,4 +101,4 @@ def list_shadcn_components_in_module(mod_name,
             del sys.modules[dep_mod]
         
         
-    return all_shadcn_components, all_shadcn_components_parts
+    return all_shadcn_components, all_shadcn_components_parts, bind_value_map
