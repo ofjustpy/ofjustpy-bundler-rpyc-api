@@ -6,6 +6,7 @@ All the system config parameters are defined here
 
 bundler_base_directory = """/zpool_nile/kabiraatmonallabs/Bundler_By_UI"""
 bundler_dir = f"{bundler_base_directory}/oj_browser_runtime"
+ssr_style_css_dir = f"{bundler_base_directory}/ssr_style_css_dir"
 node_bin_path = "/zpool_nile/kabiraatmonallabs/.nvm/versions/node/v22.18.0/bin/"
 
 # port=8181
