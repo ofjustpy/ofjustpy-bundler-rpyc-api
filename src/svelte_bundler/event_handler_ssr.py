@@ -78,8 +78,28 @@ function applyDiffPatch(diff_patch_json) {
         el.className = domDict["/classes"].trim();
         console.log(`Updated classes for ${elementId}:`, el.className);
       }
+     if (domDict.hasOwnProperty('/text')) {
+        el.innerText = domDict["/text"];
+        console.log(`Updated classes for ${elementId}:`, el.className);
+      }
+    
 
       // extend this section for future props like text, style, etc.
+      const attrs = details.attrs || {};
+      for  (var attr in attrs){
+      if (attr === "/disabled"){
+               if (attrs[attr] === "False") {
+                el.removeAttribute("disabled");
+                console.log(`remove disabled ${elementId}`);
+               }
+              if (attrs[attr] === "True") {
+                 el.setAttribute("disabled", "");
+                 console.log(`set disabled ${elementId} `);
+              }
+      } 
+
+     }
+   
     }
 
   } catch (err) {
@@ -89,15 +109,18 @@ function applyDiffPatch(diff_patch_json) {
 
 
 async function sendEventAjax(e) {
+    const currentEl = e.currentTarget;
     const data = {
     event_data: {
      event_type: e.type,
       page_id : page_id,
       data: e.data,
-      id: e.target?.id || null,
-      tag: e.target?.tagName || null,
-      value: e.target?.value || null,
-      text: e.target?.innerText || null
+      id: currentEl?.id || null,
+      tag: currentEl?.tagName || null,
+      value: currentEl?.value || null,
+      text: currentEl?.innerText || null
+
+
     },
     csrftoken: 'someothervalue'
   };
@@ -146,6 +169,8 @@ async function sendEventAjax(e) {
 async function eventHandler(e) {
   // prevent default if needed
   // e.preventDefault();
+  const el = event.currentTarget;
+  console.log("Current Target ID:", el.id);
   await sendEventAjax(e);
 }
 

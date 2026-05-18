@@ -16,6 +16,7 @@ from .helper_utils import build_fetch_bundle
 from .config import bundler_dir, node_bin_path
 from .app_css_template import build_app_css
 from .publish_tailwind_svelte_safelist import publish_tailwind_svelte_safelist
+from .publish_lucide_icons_component_render_svelte import publish_lucide_icons_component_render_svelte
 
 import jsexprs.macro_module as jsexprs_mm    
 def kebab_lower(label):
@@ -85,17 +86,22 @@ def build_bundle(target_module,
                                                           import_var_stmts,
                                                           ssh_client_manager)
 
-        
+
+        # TBD
+        #has_skeleton_components = publish_skeleton_component_render_svelte(target_module, dep_modules, ssh_client_manager)
         build_app_css()
 
-        # publish safelist
+        # ===================== publish safelist =====================
         publish_tailwind_svelte_safelist(target_module,
                                          dep_modules
                                          )
 
+        enable_lucide_icons_components = True
+        publish_lucide_icons_component_render_svelte(target_module, dep_modules, ssh_client_manager)
 
         publish_component_render_by_type(enable_shadcn_components = has_shadcn_components,
-                                         enable_shadcn_bindvalue_components = has_shadcn_bindvalue_components 
+                                         enable_shadcn_bindvalue_components = has_shadcn_bindvalue_components ,
+                                         enable_lucide_icons_components = enable_lucide_icons_components
                                          )
         build_fetch_bundle(output_dir)
         

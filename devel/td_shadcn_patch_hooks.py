@@ -1,0 +1,5 @@
+from shadcnui_patch_hooks import list_imported_components_in_module
+
+target_module =  "sample_import_shadcn_components"
+
+list_imported_components_in_module(target_module)

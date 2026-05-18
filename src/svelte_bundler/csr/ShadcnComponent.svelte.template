@@ -1,0 +1,32 @@
+
+<script lang="ts">
+    export let jp_props;
+    export let comp_ref;
+    import ComponentRenderByType from './ComponentRenderByType.svelte';
+
+    $shadcn_component_import_stmt
+
+    let components =  { $kv_label_to_shadcn_comp_map
+
+                       }
+
+   console.log("jp_props in ShadnComponents", jp_props);
+
+    $$: descriptionObject = {
+    ...jp_props.attrs,
+    style: jp_props.style,
+    class: jp_props.classes, 
+  };
+</script>
+<svelte:component this={components[jp_props.html_tag]} {...descriptionObject}>
+{#if jp_props.text}{jp_props.text}{/if}
+  {#each jp_props.object_props as cobj_props}
+    {#if cobj_props.show}
+      <svelte:component this={ComponentRenderByType} jp_props={cobj_props}/>
+    {/if}
+  {/each}
+{#if jp_props.inner_html}{@html jp_props.inner_html}{/if}
+  </svelte:component>
+
+
+ 

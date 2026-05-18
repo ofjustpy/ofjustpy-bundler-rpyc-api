@@ -90,10 +90,12 @@ class SSHClientManager:
             for line in stderr:
                 sys.stderr.write(line)
 
+        except socket.timeout:  
+            print(f"Command '{description}' timed out.")
+            
         except paramiko.SSHException as e:
             print (f"SSH error: {e}")
-        except paramiko.PipeTimeout:
-            print("Timeout error: The read operation timed out.")
+
             
             
     def get_file(self, remote_file_path, local_file_path):

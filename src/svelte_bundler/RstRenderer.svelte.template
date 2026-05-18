@@ -1,0 +1,211 @@
+<script lang="ts">
+  import { onMount} from 'svelte';
+  import { loadPyodide } from 'pyodide';
+  $ingest_file_import_stmts
+  $kavya_dependency_whl_import_stmts
+  $kavya_stack_zip_import_stmts
+
+  let { 
+        rstInput = "", 
+        htmlOutput = $$bindable(""),
+        onrender // This replaces createEventDispatcher
+      } = $$props();
+
+
+
+  let pyodide: any = $$state(null);
+  let isReady = $$state(false);
+  let isProcessing = $$state(false);
+  let statusMessage = $$state("Initializing Python Environment...");
+
+
+
+
+
+
+  onMount(async () => {
+    try {
+      // 1. Initialize Pyodide
+      pyodide = await loadPyodide({
+        indexURL: "/pyodide" // Ensure pyodide files are served at this public URL
+      });
+
+      $ingest_file_write_fs_stmts
+      
+      if (!pyodide.FS.analyzePath("static").exists) pyodide.FS.mkdir("static");
+      if (!pyodide.FS.analyzePath("pyodide").exists) pyodide.FS.mkdir("pyodide");
+
+      // 3. Install Dependencies
+      await pyodide.loadPackage("micropip");
+      const micropip = pyodide.pyimport("micropip");
+      
+      // Install standard packages
+      await micropip.install([
+        "json_fix", "lxml", "starlette", "ssl", "anyio", 
+        "blake2signer", "fastapi", "addict", "docutils", "pygments"
+      ]);
+
+      // 4. Unpack Bundled Wheels/Zips
+      
+      $kavya_dependency_unpack_archive_stmts
+      $kavya_unpack_zip_stmts
+      
+      console.log("Assets unpacked.");
+
+      // 5. Environment & Mock Setup (Run Once)
+      await pyodide.runPythonAsync(`
+        import os
+        import sys
+        from unittest.mock import MagicMock
+        
+        # Environment Setup
+        base_dir = "/home/pyodide/svg_data_test"
+        os.environ["ICON_SVG_REPO_BASEDIR"] = base_dir
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+
+        # --- MOCK PSUTIL (Critical for Kavya Stack) ---
+        mock_psutil = MagicMock()
+        mock_psutil.cpu_percent.return_value = 10.5
+        
+        mock_proc_instance = MagicMock()
+        mock_mem_info = MagicMock()
+        mock_mem_info.rss = 52428800 
+        mock_proc_instance.memory_info.return_value = mock_mem_info
+        mock_psutil.Process.return_value = mock_proc_instance
+        
+        sys.modules["psutil"] = mock_psutil
+
+        # --- PRE-IMPORT LIBRARIES ---
+        # Importing these now speeds up the first render
+        import dpath
+        import aenum
+        import addict
+        import cachetools
+        import lxml
+        import itsdangerous
+        import docutils
+        import pygments
+        
+        # Import App Specifics
+        import kavya as kv
+        from rst_renderer import render_rst
+        import anyio
+        
+        # Setup Global Kavya Style
+        kv.set_style('un')
+        
+        print("✅ Python Environment Ready")
+      `);
+
+      isReady = true;
+      statusMessage = "Ready";
+      
+      // If RST input was provided before init finished, process it now
+      if (rstInput) {
+        processRst();
+      }
+
+    } catch (error) {
+      console.error("Pyodide Init Failed:", error);
+      statusMessage = "Initialization Failed";
+    }
+  });
+
+  // Reactively trigger processing when rstInput changes
+  $$effect(() => {
+     if (isReady && rstInput) {
+       processRst(); 
+     }
+   }); 
+
+
+  async function processRst() {
+    if (!rstInput || !isReady) return;
+    
+    isProcessing = true;
+    statusMessage = "Rendering...";
+
+    try {
+      // Pass the raw RST string to Python global scope
+      pyodide.globals.set("user_rst_input", rstInput);
+
+      // Execute the render logic
+      const resultHtml = await pyodide.runPythonAsync(`
+        import kavya as kv
+        from rst_renderer import render_rst
+        from unittest.mock import MagicMock
+        
+        # 1. Render RST to Container
+        container = render_rst(user_rst_input)
+
+        # 2. Create Endpoint Wrapper
+        wp_endpoint = kv.create_endpoint(
+            key="button",
+            childs=[container],
+            title="Generated Page",
+            skeleton_data_theme="sahara",
+            ssr_bundle_dir="ssr",
+            rendering_type="SSR"
+        )
+
+        # 3. Mock Request for SSR
+        mock_request = MagicMock()
+        mock_request.path_params = {"id": 123}
+        mock_request.url_for.return_value = "/static/resource/path"
+
+        # 4. Generate Response
+        wp = wp_endpoint(mock_request)
+        response = await wp.get_response_for_load_page(mock_request)
+
+        # 5. Decode and Return HTML
+        html_bytes = response.body
+        html_bytes.decode("utf-8") 
+      `);
+
+      htmlOutput = resultHtml;
+      // Use the callback prop instead of dispatch
+      onrender?.({ html: htmlOutput });
+      statusMessage = "Render Complete";
+
+    } catch (error) {
+      console.error("RST Rendering Failed:", error);
+      statusMessage = "Error in rendering";
+      htmlOutput = `<div class="error">Error rendering RST: $${error}</div>`;
+    } finally {
+      isProcessing = false;
+    }
+  }
+</script>
+
+<div class="rst-renderer-container">
+  {#if !isReady || isProcessing}
+    <div class="status-bar">
+      <span class="spinner">⏳</span> {statusMessage}
+    </div>
+  {/if}
+
+  <div class="output-preview">
+    {#if htmlOutput}
+        {@html htmlOutput}
+    {/if}
+  </div>
+</div>
+
+<style>
+  .rst-renderer-container {
+    width: 100%;
+    position: relative;
+  }
+  .status-bar {
+    background: #f0f0f0;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #ccc;
+    color: #555;
+  }
+  .output-preview {
+    min-height: 200px;
+    border: 1px solid #eee;
+  }
+</style>

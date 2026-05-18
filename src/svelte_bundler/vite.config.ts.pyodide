@@ -1,0 +1,42 @@
+import { defineConfig } from 'vite'
+import tailwindcss from "@tailwindcss/vite";
+
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import arraybuffer from 'vite-plugin-arraybuffer'; // <--- Import this
+import path from "path";
+
+// https://vite.dev/config/
+export default defineConfig({
+// 1. Ensure paths work even if you host on a subpath (e.g. /myapp/)
+  base: './',
+  plugins: [ tailwindcss(),
+	  arraybuffer(), 
+	  viteStaticCopy({
+      targets: [
+        {
+          // 1. Copy Pyodide WASM/JS files from node_modules to "dist/pyodide"
+          src: 'node_modules/pyodide/*',
+          dest: 'pyodide'
+        }
+      ]
+    })
+  ],
+  resolve: {
+    alias: {
+      $lib: path.resolve("./src/lib"),
+    },
+  },
+    build: { 
+	   sourcemap: true,
+    lib: {
+      entry: 'src/main.ts', // Specify the entry file for the bundle
+      name: 'jpComponentBuilder', // Specify the global variable name for the bundle
+      formats:['iife'],
+      fileName: 'bundle', // Specify the name of the bundle file
+    },
+    rollupOptions: {
+      output: {
+      },
+    },
+  },
+})

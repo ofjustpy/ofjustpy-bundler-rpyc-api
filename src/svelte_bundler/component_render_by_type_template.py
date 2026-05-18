@@ -2,8 +2,12 @@ from string import Template
 component_render_by_type_template = Template("""
 <script lang="ts">
    import Htmlcomponents from './Htmlcomponents.svelte';
+   import PlainTextComponent from './PlainTextComponent.svelte';
+   import SVGComponent from './SVGComponent.svelte';
    $component_import_jsstr
    let components = { 'html_component': Htmlcomponents,
+                      'svg_component': SVGComponent,
+                        'plaintext_component': PlainTextComponent,
                        $component_map_jsstr
 
                     }
@@ -53,7 +57,7 @@ def publish_component_render_by_type(enable_svg_components=False,
                                      enable_shadcn_components = True,
                                      enable_shadcn_bindvalue_components = False,
                                      enable_skeleton_components = False,
-                                     enable_lucide_components = False,
+                                     enable_lucide_icons_components = False,
                                      enable_shadcn_layerchart_components=False):
     component_map_stmts = []
     component_import_stmts = []
@@ -70,7 +74,12 @@ def publish_component_render_by_type(enable_svg_components=False,
         component_import_stmts.append("import ShadcnComponentBindValue from './ShadcnBindValueComponent.svelte';")
 
 
+    if enable_lucide_icons_components:
+        component_map_stmts.append("'lucide_component': LucideComponent,")
+        component_import_stmts.append("import LucideComponent from './LucideComponent.svelte';;")
 
+        
+        
     component_import_jsstr = "\n".join(component_import_stmts)
     component_map_jsstr = "\n".join(component_map_stmts)
 
