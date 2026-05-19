@@ -103,8 +103,7 @@ svg.svg-inline--fa {
 @import '@skeletonlabs/skeleton/themes/cerberus';
 @import '@skeletonlabs/skeleton/themes/mint';
 {additional_skui_themes_stmt}
-@import './spooky_purple';
-@import './Mountains';                        
+
 @source '../node_modules/@skeletonlabs/skeleton-svelte/dist';            
 """
             skeleton_app_css ="""
