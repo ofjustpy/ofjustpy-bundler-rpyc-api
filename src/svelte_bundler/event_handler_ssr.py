@@ -129,6 +129,15 @@ async function sendEventAjax(e) {
     if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
     const result = await resp.json();
     console.log("✅ Server response:", result);
+  // Handle redirect directive if present
+  if (result.redirect_to_url) {
+    console.log("🔗 Redirecting to:", result.redirect_to_url);
+    window.location.href = result.redirect_to_url;
+    // Optional: Return a promise that never resolves to stop further execution 
+    // while the browser handles the page tear-down/load.
+    return new Promise(() => {});
+  }
+
     if (result.diff_patch) {
     applyDiffPatch(result.diff_patch);
    }

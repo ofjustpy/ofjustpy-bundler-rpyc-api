@@ -51,7 +51,7 @@ def build_ssr_style_css(target_module,
 
         res  = get_twtags_safelist(target_module)
         print("get twtags list = ", res)
-        if len(res.fontawesome_components) > 0:
+        if res.num_fontawesome_components > 0:
             enable_fontawesome = True
             fontawesome_app_css_import_stmt = """@import "@fortawesome/fontawesome-free/css/all.min.css";
 svg.svg-inline--fa {
@@ -246,7 +246,6 @@ svg.svg-inline--fa {
                                                         """
                                                         )
             
-        # install fontawesome
         if enable_fontawesome:
             runtime_context.ssh_client_manager.exec_command("build bundle",
                                         f"""cd {ssr_style_css_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;

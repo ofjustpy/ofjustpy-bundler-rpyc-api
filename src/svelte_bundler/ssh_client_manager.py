@@ -1,6 +1,6 @@
 import paramiko
 import sys
-
+import os
 font_family_twcfg_mapping = {
 		   'poppins': ['Poppins', 'sans-serif'],
 		   'roboto': ['Roboto', 'sans-serif'],
@@ -71,10 +71,19 @@ class SSHClientManager:
         self.username = username
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
+        private_key_path = os.path.expanduser("~/.ssh/id_ed25519")
+        self.my_key = paramiko.Ed25519Key.from_private_key_file(private_key_path)
+        
 
     def __enter__(self):
-        self.ssh_client.connect(self.hostname, port=self.port, username=self.username)
+        #self.ssh_client.connect(self.hostname, port=self.port, username=self.username)
+        self.ssh_client.connect(hostname=self.hostname,  # Using raw IP is safest to avoid DNS/banner lag
+                                username=self.username,
+                                pkey=self.my_key,
+                                port = self.port
+
+                                )
+        
         self.sftp_client = self.ssh_client.open_sftp()
 
         return self
