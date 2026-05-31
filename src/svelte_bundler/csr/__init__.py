@@ -61,6 +61,16 @@ def install_csr_components(runtime_context,
         # pnpm add ace-builds
         pass
     
+def kebab_to_pascal(text: str) -> str:
+    """Converts a kebab-case string to PascalCase.
+    
+    Args:
+        text (str): The string to convert (e.g., "alert-dialog").
+        
+    Returns:
+        str: The converted PascalCase string (e.g., "AlertDialog").
+    """
+    return "".join(word.capitalize() for word in text.split("-"))
 
 def build_csr_svelte_bundle(target_module,
                             enable_skui_theme_selector = False, 
@@ -380,7 +390,6 @@ def build_csr_svelte_bundle(target_module,
 
         # ========================== pyodide =========================
         if enable_inbrowser_exec:
-            print("calling inbrowser exec")
             setup_inbrowser_kavya_exec(ssh_client_manager, remote_svelte_bundle_dir )
         
         # ============================ end ===========================
@@ -395,7 +404,7 @@ def build_csr_svelte_bundle(target_module,
         # ============== prepare ShadcnComponent.svelte ==============
         shadcn_component_import_stmt = "\n".join([f"""  
 
-        import * as {_} from "$lib/components/ui/{_.lower()}/index.js";
+        import * as {kebab_to_pascal(_)} from "$lib/components/ui/{_.lower()}/index.js";
         
         """ for _ in page_csr_components.shadcn_components.labels])
         
