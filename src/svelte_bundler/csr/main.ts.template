@@ -7,7 +7,7 @@ import RstRenderer from './RstRenderer.svelte';
 import { rstInputState, updateRst } from './RstInputState.svelte';
 import { scui_CSR_components } from './scui_csr_components.js';
 import { csr_components } from './csr_components.js';
-
+import {lucide_CSR_components} from './lucide_csr_icons.js';
 document.addEventListener('DOMContentLoaded', () => {
 const allComponents = [...scui_CSR_components, ...csr_components];
 

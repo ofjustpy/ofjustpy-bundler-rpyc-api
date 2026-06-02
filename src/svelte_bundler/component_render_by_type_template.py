@@ -8,7 +8,7 @@ component_render_by_type_template = Template("""
    let components = { 'html_component': Htmlcomponents,
                       'svg_component': SVGComponent,
                         'plaintext_component': PlainTextComponent,
-                       $component_map_jsstr
+$component_map_jsstr
 
                     }
                     ;

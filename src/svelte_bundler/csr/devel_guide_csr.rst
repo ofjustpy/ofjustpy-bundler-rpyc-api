@@ -21,6 +21,10 @@ Steps in csr/__init__.py
      - create `src/scui_csr_components.js`
      - using shadcn_components.json
 
+   - lucide icons json
+     - create src/lucide_csr_icons.js
+       - using lucide_icons.json
+	 
    - csr components json (e.g. ace editor)
      - create src/csr_components.js
        - using csr_components.json

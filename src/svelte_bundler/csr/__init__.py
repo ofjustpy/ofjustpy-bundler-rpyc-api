@@ -38,6 +38,7 @@ from .helper_utils import build_and_fetch_bundle
 from ..setup_inbrowser_kavya_exec import setup_inbrowser_kavya_exec
 from ..event_handler_ssr import ajax_event_handling
 from .publish_component_render_by_type import publish_component_render_by_type
+from .publish_lucide_icons_component_render_svelte import publish_lucide_icons_component_render_svelte
 # Get the directory of the current file
 current_dir = Path(__file__).parent.resolve()
 
@@ -91,6 +92,16 @@ def build_csr_svelte_bundle(target_module,
 
                              )
         # TODO: install the used csr components
+
+        # ============================ end ===========================
+
+        # ============= write json for lucide components =============
+        # we don't need lucide_csr_icons.js
+        # lucide icons are captured as csr components 
+        # write_to_bundler_dir(f"""export const lucide_CSR_components = {page_csr_components.lucide_icons.json};""",
+        #                      "src/lucide_csr_icons.js",
+        #                      target_bundler_dir = remote_svelte_bundle_dir
+        #                      )
 
         # ============================ end ===========================
         
@@ -435,6 +446,15 @@ def build_csr_svelte_bundle(target_module,
         # ============================================================
         install_csr_components(runtime_context, page_csr_components.csr_components.html_tag)
 
+        # ============================================================
+        # ======================= lucide icons =======================
+        # ============================================================
+        enable_lucide_icons_components = True
+        publish_lucide_icons_component_render_svelte()
+
+        
+
+        
         # ============================================================
         # =================== ComponentRenderByType ==================
         # TODO: enable_lucide_icons_components should come for twtags_safelist
