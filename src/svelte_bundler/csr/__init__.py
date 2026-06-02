@@ -33,10 +33,11 @@ from ..config import node_bin_path
 from twtags_safelist import (get_csr_components, 
                              get_twtags_safelist
                              )
-from ..helper_utils import build_fetch_bundle, write_to_bundler_dir
+from ..helper_utils import  write_to_bundler_dir
+from .helper_utils import build_and_fetch_bundle
 from ..setup_inbrowser_kavya_exec import setup_inbrowser_kavya_exec
 from ..event_handler_ssr import ajax_event_handling
-
+from .publish_component_render_by_type import publish_component_render_by_type
 # Get the directory of the current file
 current_dir = Path(__file__).parent.resolve()
 
@@ -80,10 +81,6 @@ def build_csr_svelte_bundle(target_module,
     # get the list of all shadcn and csr components used by the page 
     page_csr_components = get_csr_components(target_module)
     res  = get_twtags_safelist(target_module)
-    print("twtags_safelist res = ", res)
-
-    local_svelte_bundle_dir = 'static/' + res.svelte_bundle_dir
-    
     with SSHClientManager(hostname, port, username) as ssh_client_manager:
         runtime_context.ssh_client_manager = ssh_client_manager
         # ===================== shadcn components ====================
@@ -96,6 +93,7 @@ def build_csr_svelte_bundle(target_module,
         # TODO: install the used csr components
 
         # ============================ end ===========================
+        
         # ============= csr components (like ace editor) =============
         write_to_bundler_dir(f"""export const csr_components = {page_csr_components.csr_components.json};""",
                              "src/csr_components.js",
@@ -113,7 +111,7 @@ def build_csr_svelte_bundle(target_module,
         
         # ============================ end ===========================
         
-
+        # ====================================================================
         # =================== skeleton ui and theme ==================
         skeleton_ui_css = ""
         skeleton_ui_import = ""
@@ -220,7 +218,9 @@ def build_csr_svelte_bundle(target_module,
 
 """
             # ========================== end =========================
+            # ========================================================
             # ==================== app css ====================
+            # ========================================================
         shadcn_app_css = """
 :root {
   --radius: 0.625rem;
@@ -362,17 +362,19 @@ def build_csr_svelte_bundle(target_module,
         # TODO: websocket based event handling
         # ==================== ssr event handling ====================
         ssr_event_handler_stmt = ""
-        if res.enable_event_handling:
-            write_to_bundler_dir(ajax_event_handling,
-                                 "src/ssr_event_handler.js",
-                                 target_bundler_dir=remote_svelte_bundle_dir
-                                 )
-            ssr_event_handler_stmt = "import './ssr_event_handler.js';"
+        # if res.enable_event_handling:
+        #     write_to_bundler_dir(ajax_event_handling,
+        #                          "src/ssr_event_handler.js",
+        #                          target_bundler_dir=remote_svelte_bundle_dir
+        #                          )
+        #     ssr_event_handler_stmt = "import './ssr_event_handler.js';"
                         
         # ============================ end ===========================
         
 
+        # ============================================================
         # ========================== main.ts =========================
+        # ============================================================
         main_ts_template = Template(Path(current_dir / 'main.ts.template').read_text(encoding='utf-8'))
         
         main_ts_cstr = main_ts_template.substitute(skeleton_theme_selector_stmt = skeleton_theme_selector_stmt,
@@ -394,7 +396,9 @@ def build_csr_svelte_bundle(target_module,
         
         # ============================ end ===========================
 
+        # ============================================================
         # =================== add shadcn components ==================
+        # ============================================================
         shadcn_component_install_stmt = ";".join([f"""pnpm dlx shadcn-svelte@latest add {_.lower()} --yes"""
                                                   for _ in page_csr_components.shadcn_components.labels])
 
@@ -425,25 +429,21 @@ def build_csr_svelte_bundle(target_module,
                              target_bundler_dir = remote_svelte_bundle_dir
                              )
         # ============================ end ===========================
-        # install components
+
+        # ============================================================
+        # install csr components 
+        # ============================================================
         install_csr_components(runtime_context, page_csr_components.csr_components.html_tag)
-        runtime_context.ssh_client_manager.exec_command("install shadcn components",
-                                        f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
-                                        rm -rf src/lib/components/ui/; {shadcn_component_install_stmt}
-""")
-                
-        runtime_context.ssh_client_manager.exec_command("build bundle",
-                                        f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
-                                        pnpm run build
-""")        
-        runtime_context.ssh_client_manager.get_file(f"""{remote_svelte_bundle_dir}/dist/bundle.css""",
-                                                    f"{local_svelte_bundle_dir}/style.css"
-                                                    )
 
-        runtime_context.ssh_client_manager.get_file(f"""{remote_svelte_bundle_dir}/dist/bundle.iife.js""",
-                                                    f"{local_svelte_bundle_dir}/bundle.iife.js"
-                                                    )
+        # ============================================================
+        # =================== ComponentRenderByType ==================
+        # TODO: enable_lucide_icons_components should come for twtags_safelist
+        publish_component_render_by_type(enable_svg_components=True,
+                                         enable_lucide_icons_components = True
+                                         )
+        
+        # ============================================================
 
-        runtime_context.ssh_client_manager.get_file(f"""{remote_svelte_bundle_dir}/dist/bundle.iife.js.map""",
-                                                    f"{local_svelte_bundle_dir}/bundle.iife.js.map"
-                                                    )
+        print("Done")
+        build_and_fetch_bundle(res.svelte_bundle_dir, shadcn_component_install_stmt)
+        pass

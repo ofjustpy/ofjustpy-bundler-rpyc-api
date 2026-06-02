@@ -6,6 +6,7 @@ from . import runtime_context
 def write_to_bundler_dir(content_str,
                          target_rel_dir,
                          target_bundler_dir=bundler_dir):
+    print("now writing to + ", target_bundler_dir, " ", target_rel_dir)
     with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.txt') as temp_file:
         temp_file.write(content_str)
         #TODO: move to logging 

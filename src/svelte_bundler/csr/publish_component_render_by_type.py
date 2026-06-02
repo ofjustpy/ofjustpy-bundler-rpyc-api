@@ -1,15 +1,20 @@
 from string import Template
+from ..config import (hostname,
+                     port,
+                     username,
+                     csr_bundle_style_css_dir as remote_svelte_bundle_dir 
+                     )
+
 component_render_by_type_template = Template("""
 <script lang="ts">
    import Htmlcomponents from './Htmlcomponents.svelte';
    import PlainTextComponent from './PlainTextComponent.svelte';
    import SVGComponent from './SVGComponent.svelte';
-   $component_import_jsstr
+
    let components = { 'html_component': Htmlcomponents,
                       'svg_component': SVGComponent,
-                        'plaintext_component': PlainTextComponent,
-                       $component_map_jsstr
-
+                      'plaintext_component': PlainTextComponent,
+                      $component_map_jsstr
                     }
                     ;
    export let jp_props;
@@ -24,33 +29,10 @@ component_render_by_type_template = Template("""
 """
     )
 
-component_render_by_type_str = """
-<script lang="ts">
-   import Htmlcomponents from './Htmlcomponents.svelte';
-   import ShadcnComponent from './ShadcnComponent.svelte';
-   import ShadcnComponentBindValue from './ShadcnBindValueComponent.svelte';
-   
-   let components = { 'html_component': Htmlcomponents,
-                       'shadcnui_component': ShadcnComponent,
-'shadcnui_bind_value_component': ShadcnComponentBindValue
-
-                    }
-                    ;
-   export let jp_props;
-   let comp_ref;
-
-
-   
-</script>
-
-<svelte:component this={components[jp_props.vue_type]} bind:this={comp_ref} jp_props={jp_props} comp_ref={comp_ref}  />
-
-
-"""
 
     
 
-from .helper_utils import write_to_bundler_dir
+from ..helper_utils import write_to_bundler_dir
 
 def publish_component_render_by_type(enable_svg_components=False,
                                      enable_fontawesome_components = False,
@@ -62,7 +44,7 @@ def publish_component_render_by_type(enable_svg_components=False,
     component_map_stmts = []
     component_import_stmts = []
     if enable_svg_components:
-        component_map_stmt.append("'svg_component': SVGComponent")
+        component_map_stmts.append("'svg_component': SVGComponent")
         component_import_stmts.append("import SVGComponent from './SVGComponent.svelte';")
 
     if enable_shadcn_components:
@@ -86,4 +68,6 @@ def publish_component_render_by_type(enable_svg_components=False,
     component_render_by_type_str = component_render_by_type_template.substitute(component_map_jsstr = component_map_jsstr,
                                                  component_import_jsstr = component_import_jsstr
                                                  )
-    write_to_bundler_dir(component_render_by_type_str , "src/ComponentRenderByType.svelte")
+    write_to_bundler_dir(component_render_by_type_str , "src/ComponentRenderByType.svelte",
+                         target_bundler_dir = remote_svelte_bundle_dir
+                         )
