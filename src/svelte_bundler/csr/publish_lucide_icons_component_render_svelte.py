@@ -14,7 +14,7 @@ import { Home, Library, Cog, EyeOff, Trash2, Eye, Lock, Sparkle, CircleX, Circle
 let iconMap_dict = {
     		 'home': Home,
 		 'eye': Eye,
-		 'eyeoff': EyeOff,
+		 'eye-off': EyeOff,
 		 'trash2': Trash2,
 		 'lock': Lock,
 		 'sparkle': Sparkle,

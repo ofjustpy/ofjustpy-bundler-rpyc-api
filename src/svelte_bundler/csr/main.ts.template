@@ -11,6 +11,7 @@ import {lucide_CSR_components} from './lucide_csr_icons.js';
 document.addEventListener('DOMContentLoaded', () => {
 const allComponents = [...scui_CSR_components, ...csr_components];
 
+
 allComponents.forEach((jsonStr) => {
 try {
     const compData = JSON.parse(jsonStr);

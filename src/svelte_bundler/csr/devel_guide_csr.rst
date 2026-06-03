@@ -1,3 +1,12 @@
+TODOs
+-----
+
+#. svelte_bundler is not using csr_components.html_tag
+   - it has lucide icons
+   - AceEditor
+   - etc. 
+
+
 Steps in csr/__init__.py
 ------------------------
 #. globals
