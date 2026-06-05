@@ -18,8 +18,8 @@ component_render_by_type_template = Template("""
                     ;
    export let jp_props;
    let comp_ref;
-
-
+   console.log("ComponentRenderByType for ");
+   console.log(jp_props);
    
 </script>
 
@@ -51,7 +51,7 @@ def publish_component_render_by_type(enable_svg_components=False,
         component_import_stmts.append("import ShadcnComponent from './ShadcnComponent.svelte';")
 
     if enable_shadcn_bindvalue_components:
-        component_map_stmts.append("'shadcnui_bind_value_component': ShadcnComponentBindValue")
+        component_map_stmts.append("'shadcnui_bindvalue_component': ShadcnComponentBindValue")
         component_import_stmts.append("import ShadcnComponentBindValue from './ShadcnBindValueComponent.svelte';")
 
 

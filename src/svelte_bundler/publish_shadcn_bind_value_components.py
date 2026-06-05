@@ -262,9 +262,9 @@ def publish_shadcn_bind_value_component_render_svelte(target_module,
 
 
     shadcn_component_render_src_str = component_render_src_template.substitute(shadcn_component_map_stmt = component_map_body,
-                                                                                                shadcn_component_import_stmt = component_import_body,
-                                                                                      import_var_stmts = import_var_stmts
-                                                                                                )
+                                                                               shadcn_component_import_stmt = component_import_body,
+                                                                               import_var_stmts = import_var_stmts
+                                                                               )
 
 
 

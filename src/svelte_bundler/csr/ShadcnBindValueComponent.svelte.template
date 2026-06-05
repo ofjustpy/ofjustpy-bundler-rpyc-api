@@ -1,0 +1,41 @@
+<script lang="ts">
+  
+  import ComponentRenderByType from './ComponentRenderByType.svelte';
+  import { componentValues } from './store_shadcn_bindvalue.ts';
+
+  $shadcn_component_import_stmts
+  let { jp_props, comp_ref } = $$props();
+  let other_ref = null;
+
+  let components =  {
+                        $kv_label_to_shadcn_comp_map
+                    }
+
+
+let cid = jp_props.id;
+console.log("cid = ", cid)
+let value = $$state($$componentValues[cid]);
+
+$$effect(() => {
+    console.log("The current value for", cid, "is:", value);
+  });
+let Component = components[jp_props.html_tag];
+
+
+let descriptionObject = {
+    ...jp_props.attrs,
+    style: jp_props.style,
+    class: jp_props.classes, 
+  };
+
+
+</script>
+<Component  {...descriptionObject} bind:value bind:this={other_ref}>
+{#if jp_props.text}{jp_props.text}{/if}
+  {#each jp_props.object_props as cobj_props}
+    {#if cobj_props.show}
+      <ComponentRenderByType jp_props={cobj_props}/>
+    {/if}
+  {/each}
+{#if jp_props.inner_html}{@html jp_props.inner_html}{/if}
+</Component>

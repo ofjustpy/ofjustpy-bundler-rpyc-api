@@ -19,9 +19,6 @@ def list_jsvars_in_module(mod_name,
             pass
             
         def __call__(self, *args, **kwargs):
-            print("JSVar args", args)
-            print(f"""import {{ {args[1]} }} from "{args[0]}";""")
-            
             self.import_stmts.add(f"""import {{ {args[1]} }} from "{args[0]}";""")
 
             self.var_map_key_value_stmt.add(f"  {args[1]}: {args[1]}")
@@ -37,11 +34,12 @@ def list_jsvars_in_module(mod_name,
     for dep_mod in dep_modules:
         if dep_mod in sys.modules:
             del sys.modules[dep_mod]
-        
-    with patch('jsexprs.JSVar', new=JSVarWrapper(JSVar)
+
+    wrapper = JSVarWrapper(JSVar)
+    with patch('jsexprs.JSVar', new=wrapper
                ):
         target_mod = importlib.import_module(mod_name)
 
-        
+    return list(wrapper.import_stmts), list(wrapper.var_map_key_value_stmt)
 
         
