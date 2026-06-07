@@ -18,7 +18,7 @@ type ComponentValueState = {
 
 const initialValues: ComponentValueState = {
  '/volume_slider': [50],
- '/cal1': today(getLocalTimeZone())
+ '/appointment_calendar': today(getLocalTimeZone())
 };
 
 export const componentValues = writable<ComponentValueState>(initialValues);

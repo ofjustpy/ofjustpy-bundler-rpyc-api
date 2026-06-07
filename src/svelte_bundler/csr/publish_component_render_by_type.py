@@ -18,8 +18,6 @@ component_render_by_type_template = Template("""
                     ;
    export let jp_props;
    let comp_ref;
-   console.log("ComponentRenderByType for ");
-   console.log(jp_props);
    
 </script>
 
@@ -59,7 +57,11 @@ def publish_component_render_by_type(enable_svg_components=False,
         component_map_stmts.append("'lucide_component': LucideComponent")
         component_import_stmts.append("import LucideComponent from './LucideComponent.svelte';;")
 
+    if enable_shadcn_layerchart_components:
+        component_map_stmts.append("'layerchart_component': LayerchartComponent")
+        component_import_stmts.append("import LayerchartComponent from './LayerchartComponent.svelte';;")
         
+    
         
     component_import_jsstr = "\n".join(component_import_stmts)
     component_map_jsstr = ",\n".join(component_map_stmts)

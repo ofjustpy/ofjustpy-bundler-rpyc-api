@@ -10,8 +10,7 @@
 
                        }
 
-   console.log("jp_props in ShadnComponents", jp_props);
-  console.log("The ShadnComponent", components[jp_props.html_tag]);	
+
 
     $$: descriptionObject = {
     ...jp_props.attrs,

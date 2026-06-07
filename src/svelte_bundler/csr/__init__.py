@@ -419,7 +419,7 @@ def build_csr_svelte_bundle(target_module,
                                                   for _ in [*page_csr_components.shadcn_components.labels, *page_csr_components.shadcn_bindvalue_components.labels]
                                                   ]
                                                  )
-
+        print("shadcn component install stmt = ", shadcn_component_install_stmt)
 
         # ============================ end ===========================
 
@@ -497,16 +497,51 @@ def build_csr_svelte_bundle(target_module,
 
         
         # ============================================================
+
+        # ==================== process layerchart ====================
+        layerchart_components_info = page_csr_components.layerchart_components
+        enable_shadcn_layerchart_components = False
+
+        if layerchart_components_info.labels:
+            enable_shadcn_layerchart_components = True
+
+        from .publish_layerchart_component_svelte import publish_layerchart_svelte_component
+        if enable_shadcn_layerchart_components:
+            publish_layerchart_svelte_component(layerchart_components_info.kv_label_to_layerchart_comp_map)
+        # ============================ end ===========================
         # =================== ComponentRenderByType ==================
         # TODO: enable_lucide_icons_components should come for twtags_safelist
         #. TODO:  enable_shadcn_bindvalue_components = False,
         publish_component_render_by_type(enable_svg_components=True,
                                          enable_lucide_icons_components = True,
-                                         enable_shadcn_bindvalue_components = True
+                                         enable_shadcn_bindvalue_components = True,
+                                         enable_shadcn_layerchart_components = enable_shadcn_layerchart_components
                                          )
         
         # ============================================================
 
+
+        # ====================== process jsdata ======================
+        if page_csr_components.all_jsdata:
+            # 1. Generate the JavaScript file content string
+            js_file_lines = [
+                f"globalThis.{var_name} = {json_str};"
+                for var_name, json_str in page_csr_components.all_jsdata.items()
+            ]
+
+            # Join them together with newlines to form the final file content
+            js_file_content = "\n".join(js_file_lines)
+
+            # 2. (Optional) Write the string directly to user_dataset.js
+            with open("user_dataset.js", "w", encoding="utf-8") as f:
+                f.write(js_file_content)
+    
+            write_to_bundler_dir(js_file_content,
+                                 "src/user_dataset.js",
+                                 target_bundler_dir = remote_svelte_bundle_dir
+                                 )
+            pass 
+        # ============================ end ===========================
         print("Done")
         build_and_fetch_bundle(res.svelte_bundle_dir, shadcn_component_install_stmt)
         pass
