@@ -78,13 +78,13 @@ def build_bundle(target_module,
 
 
         has_shadcn_components = publish_shadcn_component_render_svelte(target_module,
-                                                   dep_modules,
-                                               import_var_stmts,
-                                                   ssh_client_manager)
+                                                                       dep_modules,
+                                                                       import_var_stmts,
+                                                                       ssh_client_manager)
         has_shadcn_bindvalue_components = publish_shadcn_bind_value_component_render_svelte(target_module,
-                                                          dep_modules,
-                                                          import_var_stmts,
-                                                          ssh_client_manager)
+                                                                                            dep_modules,
+                                                                                            import_var_stmts,
+                                                                                            ssh_client_manager)
 
 
         # TBD

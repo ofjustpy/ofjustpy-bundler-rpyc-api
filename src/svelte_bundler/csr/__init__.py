@@ -37,7 +37,7 @@ from twtags_safelist import (get_csr_components,
 from ..helper_utils import  write_to_bundler_dir
 from .helper_utils import build_and_fetch_bundle
 from ..setup_inbrowser_kavya_exec import setup_inbrowser_kavya_exec
-from ..event_handler_ssr import ajax_event_handling
+from .event_handler_csr import ajax_event_handling
 from .publish_component_render_by_type import publish_component_render_by_type
 from .publish_lucide_icons_component_render_svelte import publish_lucide_icons_component_render_svelte
 from .publish_store_shadcn_bindvalue import publish_store_shadcn_bindvalue
@@ -61,7 +61,7 @@ window.set_skui_theme = set_skui_theme
 def install_csr_components(runtime_context,
                            csr_components_html_tag):
     for html_tag in csr_components_html_tag:
-        print("TODO: now installing ", html_tag)
+
         # pnpm add ace-builds
         pass
     
@@ -79,6 +79,7 @@ def kebab_to_pascal(text: str) -> str:
 def build_csr_svelte_bundle(target_module,
                             enable_skui_theme_selector = False, 
                             enable_inbrowser_exec=False,
+                            deploy_websocket_manager=False,
                             additional_skui_themes = []
                             ):
     # get the list of all shadcn and csr components used by the page 
@@ -132,7 +133,20 @@ def build_csr_svelte_bundle(target_module,
         skeleton_ui_css = ""
         skeleton_ui_import = ""
         skeleton_app_css = ""
-        skeleton_theme_selector_stmt = ""
+        skeleton_theme_selector_stmt = f"""
+function set_skui_theme(selectedTheme) {{
+console.log("start setting");
+
+// We already have the value passed in as 'selectedTheme'
+const html = document.querySelector('html');
+html.setAttribute('data-theme', selectedTheme);
+
+console.log("Done setting theme to:", selectedTheme);
+}}
+
+window.set_skui_theme = set_skui_theme
+"""
+            
         additional_skui_themes_stmt = "\n".join([f"@import '@skeletonlabs/skeleton/themes/{skeleton_ui_theme}';" for skeleton_ui_theme in additional_skui_themes
 
                                                   ]
@@ -361,6 +375,8 @@ def build_csr_svelte_bundle(target_module,
         shadcn_app_css = ""
         app_css_str = f"""
 @import "tailwindcss";
+/* This automatically registers bg-tertiary-50, 100, 200... up to 900 */
+@source inline("bg-tertiary-{50,100,200,300,400,500,600,700,800,900}");        
 {skeleton_ui_import}        
 @plugin "@tailwindcss/typography";
 @source "safelist.txt";    
@@ -377,16 +393,24 @@ def build_csr_svelte_bundle(target_module,
         # ============================== end =============================
         # TODO: websocket based event handling
         # ==================== ssr event handling ====================
-        ssr_event_handler_stmt = ""
-        # if res.enable_event_handling:
-        #     write_to_bundler_dir(ajax_event_handling,
-        #                          "src/ssr_event_handler.js",
-        #                          target_bundler_dir=remote_svelte_bundle_dir
-        #                          )
-        #     ssr_event_handler_stmt = "import './ssr_event_handler.js';"
+        csr_event_handler_stmt = ""
+        if res.enable_event_handling:
+            write_to_bundler_dir(ajax_event_handling,
+                                 "src/csr_event_handler.js",
+                                 target_bundler_dir=remote_svelte_bundle_dir
+                                 )
+            csr_event_handler_stmt = "import './csr_event_handler.js';"
                         
         # ============================ end ===========================
-        
+        import_websocket_manager_stmt  = ""
+        export_websocket_manager_stmt = ""
+        if deploy_websocket_manager:
+            import_websocket_manager_stmt = """
+            import { WebSocketManager } from './websocket_manager';
+            """
+            export_websocket_manager_stmt = """
+            export default {WebSocketManager}
+            """
 
         # ============================================================
         # ========================== main.ts =========================
@@ -394,8 +418,10 @@ def build_csr_svelte_bundle(target_module,
         main_ts_template = Template(Path(current_dir / 'main.ts.template').read_text(encoding='utf-8'))
         
         main_ts_cstr = main_ts_template.substitute(skeleton_theme_selector_stmt = skeleton_theme_selector_stmt,
-                                                   ssr_event_handler_stmt = ssr_event_handler_stmt
-            )
+                                                   csr_event_handler_stmt = csr_event_handler_stmt,
+                                                   import_websocket_manager_stmt = import_websocket_manager_stmt,
+                                                   export_websocket_manager_stmt = export_websocket_manager_stmt
+                                                   )
         write_to_bundler_dir(main_ts_cstr,
                                  "src/main.ts",
                                  target_bundler_dir=remote_svelte_bundle_dir
@@ -419,7 +445,6 @@ def build_csr_svelte_bundle(target_module,
                                                   for _ in [*page_csr_components.shadcn_components.labels, *page_csr_components.shadcn_bindvalue_components.labels]
                                                   ]
                                                  )
-        print("shadcn component install stmt = ", shadcn_component_install_stmt)
 
         # ============================ end ===========================
 
@@ -542,6 +567,11 @@ def build_csr_svelte_bundle(target_module,
                                  )
             pass 
         # ============================ end ===========================
-        print("Done")
+
+        # ================= deploy websocket manager =================
+        from .publish_websocker_manager import publish_websocket_manager
+        publish_websocket_manager()
+
+        # ============================ end ===========================
         build_and_fetch_bundle(res.svelte_bundle_dir, shadcn_component_install_stmt)
         pass

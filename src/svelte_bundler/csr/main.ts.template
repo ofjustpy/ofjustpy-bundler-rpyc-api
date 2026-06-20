@@ -1,6 +1,7 @@
 import { mount } from 'svelte';
 $skeleton_theme_selector_stmt
-$ssr_event_handler_stmt
+$import_websocket_manager_stmt
+$csr_event_handler_stmt
 import './app.css';
 import ComponentRenderByType from './ComponentRenderByType.svelte';
 import RstRenderer from './RstRenderer.svelte';
@@ -45,3 +46,4 @@ try {
 
 
 
+$export_websocket_manager_stmt

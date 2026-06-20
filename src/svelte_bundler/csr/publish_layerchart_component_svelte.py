@@ -1,5 +1,4 @@
 from string import Template
-from string import Template
 from ..config import (hostname,
                      port,
                      username,
