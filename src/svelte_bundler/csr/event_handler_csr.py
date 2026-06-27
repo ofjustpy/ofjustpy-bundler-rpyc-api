@@ -59,7 +59,7 @@ async function sendEventAjax(e) {
     const data = {
     event_data: {
      event_type: e.type,
-      page_id : page_id,
+      page_id : pageConfig.id,
       data: e.data,
       id: currentEl?.id || null,
       tag: currentEl?.tagName || null,
@@ -133,8 +133,8 @@ async function eventHandler(e) {
 
 // Track page ready event when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 Page is ready, sending analytics event...");
-
+  console.log("🚀 Page is ready, sending page_ready event...");
+if (typeof pageConfig !== "undefined" && pageConfig.hasPageReady === true) {
   // Construct a mock event object that matches what sendEventAjax expects
   const mockEvent = {
     type: "page_ready",
@@ -148,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Trigger the AJAX call
   sendEventAjax(mockEvent);
+}
 });
 
 

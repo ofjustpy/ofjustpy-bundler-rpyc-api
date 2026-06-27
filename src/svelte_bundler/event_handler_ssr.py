@@ -113,7 +113,7 @@ async function sendEventAjax(e) {
     const data = {
     event_data: {
      event_type: e.type,
-      page_id : page_id,
+      page_id : pageConfig.id,
       data: e.data,
       id: currentEl?.id || null,
       tag: currentEl?.tagName || null,

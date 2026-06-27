@@ -77,6 +77,10 @@ export class WebSocketManager {
                 case 'page_update':
                     this.handlePageUpdateEvent(msg);
                     break;
+                case 'diff_patch_update':
+                      this.handleDiffPatchUpdate(msg);
+                      break;
+
                 case 'websocket_update':
                     this.handleWebsocketUpdateEvent(msg);
                     break;
@@ -122,6 +126,9 @@ export class WebSocketManager {
         }
     }
 
+     handleDiffPatchUpdate(msg){
+        applyDiffPatch(msg);
+    }
     handleWebsocketUpdateEvent(msg) {
         console.log("websocket update event recieved");
         this.websocketId = msg.data;
