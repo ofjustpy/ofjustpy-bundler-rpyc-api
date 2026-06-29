@@ -508,10 +508,17 @@ window.set_skui_theme = set_skui_theme
         
 
         # ============================================================
-        # install csr components 
+        # csr components 
         # ============================================================
-        install_csr_components(runtime_context, page_csr_components.csr_components.html_tag)
-
+        #install_csr_components(runtime_context, page_csr_components.csr_components.html_tag)
+        #Note: for now canvas html tag is used by
+        enable_chartjs_component = False
+        install_chartjs = False
+        if 'canvas' in page_csr_components.csr_components.html_tag:
+            enable_chartjs_component = True
+            from .publish_chartjs_svelte_component import publish_chartjs_svelte_component
+            publish_chartjs_svelte_component()
+            install_chartjs = True
         # ============================================================
         # ======================= lucide icons =======================
         # ============================================================
@@ -540,7 +547,8 @@ window.set_skui_theme = set_skui_theme
         publish_component_render_by_type(enable_svg_components=True,
                                          enable_lucide_icons_components = True,
                                          enable_shadcn_bindvalue_components = True,
-                                         enable_shadcn_layerchart_components = enable_shadcn_layerchart_components
+                                         enable_shadcn_layerchart_components = enable_shadcn_layerchart_components,
+                                         enable_chartjs_component=enable_chartjs_component
                                          )
         
         # ============================================================
@@ -573,5 +581,5 @@ window.set_skui_theme = set_skui_theme
         publish_websocket_manager()
 
         # ============================ end ===========================
-        build_and_fetch_bundle(res.svelte_bundle_dir, shadcn_component_install_stmt)
+        build_and_fetch_bundle(res.svelte_bundle_dir, shadcn_component_install_stmt, install_chartjs=install_chartjs)
         pass

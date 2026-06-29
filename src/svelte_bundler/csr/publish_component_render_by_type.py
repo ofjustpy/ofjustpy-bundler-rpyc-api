@@ -37,7 +37,9 @@ def publish_component_render_by_type(enable_svg_components=False,
                                      enable_shadcn_bindvalue_components = False,
                                      enable_skeleton_components = False,
                                      enable_lucide_icons_components = False,
-                                     enable_shadcn_layerchart_components=False):
+                                     enable_shadcn_layerchart_components=False,
+                                     enable_chartjs_component=False
+                                     ):
     component_map_stmts = []
     component_import_stmts = []
     if enable_svg_components:
@@ -55,12 +57,16 @@ def publish_component_render_by_type(enable_svg_components=False,
 
     if enable_lucide_icons_components:
         component_map_stmts.append("'lucide_component': LucideComponent")
-        component_import_stmts.append("import LucideComponent from './LucideComponent.svelte';;")
+        component_import_stmts.append("import LucideComponent from './LucideComponent.svelte';")
 
     if enable_shadcn_layerchart_components:
         component_map_stmts.append("'layerchart_component': LayerchartComponent")
-        component_import_stmts.append("import LayerchartComponent from './LayerchartComponent.svelte';;")
-        
+        component_import_stmts.append("import LayerchartComponent from './LayerchartComponent.svelte';")
+
+    if enable_chartjs_component:
+        component_map_stmts.append("'chartjs_component' : ChartJS")
+        component_import_stmts.append("import ChartJS from './ChartJSComponent.svelte';")
+                
     
         
     component_import_jsstr = "\n".join(component_import_stmts)

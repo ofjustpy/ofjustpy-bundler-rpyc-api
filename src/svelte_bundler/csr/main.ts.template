@@ -19,19 +19,25 @@ try {
     const targetId = compData.id;
     const targetElement = document.getElementById(targetId);
     console.log("mounting now ", targetId);
-    if (targetElement) {
-      // 2. Clear the placeholder content (optional, ensures clean slate)
-      targetElement.innerHTML = '';
+if (targetElement) {
+      // 1. Create a temporary off-screen container
+      const tempContainer = document.createElement('div');
 
-      // 3. Mount the Svelte component onto this specific element
+      // 2. Mount Svelte into the temporary container
       mount(ComponentRenderByType, {
-        target: targetElement,
+        target: tempContainer,
         props: {
           jp_props: compData
         }
       });
+
+      // 3. Swap the targetElement with Svelte's rendered element
+      // (This grabs the actual <svg> Svelte created and replaces the old placeholder)
+      if (tempContainer.firstElementChild) {
+        targetElement.replaceWith(tempContainer.firstElementChild);
+        console.log(`Successfully replaced and mounted component: $${targetId}`);
+      }
       
-      console.log(`Mounted component $${targetId}`);
     } else {
       console.warn(`Target DOM element not found for ID: $${targetId}`);
     }

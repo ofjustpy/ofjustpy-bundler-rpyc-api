@@ -7,12 +7,26 @@ from ..config import (hostname,
 from ..config import node_bin_path
 
 
-def build_and_fetch_bundle(svelte_bundle_dir, shadcn_component_install_stmt):
+def build_and_fetch_bundle(svelte_bundle_dir, shadcn_component_install_stmt, install_chartjs=False):
     local_svelte_bundle_dir = 'static/' + svelte_bundle_dir
     runtime_context.ssh_client_manager.exec_command("install shadcn components",
                                         f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
                                         rm -rf src/lib/components/ui/; {shadcn_component_install_stmt}
 """)
+
+    if install_chartjs: 
+        runtime_context.ssh_client_manager.exec_command("install chartjs lib",
+                                            f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
+                                             pnpm install chart.js
+                                            """)
+    else:
+        runtime_context.ssh_client_manager.exec_command("uninstall chartjs lib",
+                                                                                                    f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
+                                             pnpm remove chart.js
+                                                                                                    """
+                                                        )
+    
+    
                 
     runtime_context.ssh_client_manager.exec_command("build bundle",
                                         f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
