@@ -3,12 +3,13 @@ $skeleton_theme_selector_stmt
 $import_websocket_manager_stmt
 $csr_event_handler_stmt
 import './app.css';
-import ComponentRenderByType from './ComponentRenderByType.svelte';
+import { mountComponentByType } from './ComponentFactory.svelte.js';
 import RstRenderer from './RstRenderer.svelte';
 import { rstInputState, updateRst } from './RstInputState.svelte';
 import { scui_CSR_components } from './scui_csr_components.js';
 import { csr_components } from './csr_components.js';
 import {lucide_CSR_components} from './lucide_csr_icons.js';
+import { addKVIdRef } from './componentMap.svelte.js';
 document.addEventListener('DOMContentLoaded', () => {
 const allComponents = [...scui_CSR_components, ...csr_components];
 
@@ -23,19 +24,15 @@ if (targetElement) {
       // 1. Create a temporary off-screen container
       const tempContainer = document.createElement('div');
 
-      // 2. Mount Svelte into the temporary container
-      mount(ComponentRenderByType, {
-        target: tempContainer,
-        props: {
-          jp_props: compData
-        }
-      });
+
+      const compRef = mountComponentByType(tempContainer, compData);
 
       // 3. Swap the targetElement with Svelte's rendered element
       // (This grabs the actual <svg> Svelte created and replaces the old placeholder)
       if (tempContainer.firstElementChild) {
         targetElement.replaceWith(tempContainer.firstElementChild);
         console.log(`Successfully replaced and mounted component: $${targetId}`);
+	addKVIdRef(targetId, compRef);
       }
       
     } else {

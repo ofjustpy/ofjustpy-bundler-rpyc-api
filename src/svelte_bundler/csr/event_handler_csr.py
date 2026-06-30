@@ -1,4 +1,6 @@
+
 ajax_event_handling="""
+import { componentMapStore, addKVIdRef } from './componentMap.svelte.js';
 function applyDiffPatch(diff_patch_json) {
   try {
     const diffPatch = JSON.parse(diff_patch_json);
@@ -11,14 +13,44 @@ function applyDiffPatch(diff_patch_json) {
     const updates = diffPatch.data;
 
     for (const [elementId, details] of Object.entries(updates)) {
-      const el = document.getElementById(elementId);
+      const isComponent = Object.prototype.hasOwnProperty.call(componentMapStore.current, elementId);
+      if (isComponent) {
+      const compRef = componentMapStore.current[elementId];
+
+  // Try to find the actual underlying DOM element wrapper (commonly .element or .dom depending on your component setup)
+
+  const domNode =  compRef.getElement()
+  
+
+  if (domNode && domNode.tagName) {
+    console.log(`component element <${domNode.tagName.toLowerCase()} id="${domNode.id}">`);
+  } else {
+    console.log(`component element <svelte-component id="${elementId}"> (DOM element not exposed)`);
+  }
+  const domDict = details.domDict || {};
+      // update classes
+if (domDict.hasOwnProperty('/classes')) {
+  // el.className = domDict["/classes"].trim();
+  console.log(`Update ignored classes for ${elementId}:`, el.className);
+} else if (domDict.hasOwnProperty('/text')) {
+  // el.innerText = domDict["/text"];
+  console.log(`Update ignore text for ${elementId}:`, el.innerText); // Fixed original typo here (changed classes to text)
+} else {
+// there should be more checks to see if this is for updateChartConfig
+
+}
+
+
+
+
+  } else {
+   const el = document.getElementById(elementId);
       if (!el) {
         console.warn(`Element with id '${elementId}' not found`);
         continue;
       }
-
-      const domDict = details.domDict || {};
-
+  console.log(`Processing regular element <${el.tagName.toLowerCase()} id="${el.id}">`);
+  const domDict = details.domDict || {};
       // update classes
       if (domDict.hasOwnProperty('/classes')) {
         el.className = domDict["/classes"].trim();
@@ -28,9 +60,7 @@ function applyDiffPatch(diff_patch_json) {
         el.innerText = domDict["/text"];
         console.log(`Updated classes for ${elementId}:`, el.className);
       }
-    
-
-      // extend this section for future props like text, style, etc.
+    // extend this section for future props like text, style, etc.
       const attrs = details.attrs || {};
       for  (var attr in attrs){
       if (attr === "/disabled"){
@@ -45,7 +75,7 @@ function applyDiffPatch(diff_patch_json) {
       } 
 
      }
-   
+}
     }
 
   } catch (err) {

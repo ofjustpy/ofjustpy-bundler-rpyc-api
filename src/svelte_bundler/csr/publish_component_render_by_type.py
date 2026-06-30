@@ -6,23 +6,37 @@ from ..config import (hostname,
                      )
 
 component_render_by_type_template = Template("""
-<script lang="ts">
+   import { mount } from 'svelte';
    import Htmlcomponents from './Htmlcomponents.svelte';
    import PlainTextComponent from './PlainTextComponent.svelte';
    $component_import_jsstr
-   let components = { 'html_component': Htmlcomponents,
+   const componentsRegistry = { 'html_component': Htmlcomponents,
                       'svg_component': SVGComponent,
                       'plaintext_component': PlainTextComponent,
                       $component_map_jsstr
                     }
                     ;
-   export let jp_props;
-   let comp_ref;
-   
-</script>
 
-<svelte:component this={components[jp_props.vue_type]} bind:this={comp_ref} jp_props={jp_props} comp_ref={comp_ref}  />
+export function mountComponentByType(targetElement, compData) {
+    // Determine the type from your JSON properties
+    const typeKey = compData.vue_type; 
+    const ComponentClass = componentsRegistry[typeKey];
 
+    if (!ComponentClass) {
+        throw new Error(`Unknown component type registered: $${typeKey}`);
+    }
+
+    // 2. Mount the actual component directly into the target DOM element
+    // This returns the exact instance of the component (no wrappers!)
+    const compRef = mount(ComponentClass, {
+        target: targetElement,
+        props: {
+            jp_props: compData
+        }
+    });
+
+    return compRef;
+}
 """
     )
 
@@ -75,6 +89,6 @@ def publish_component_render_by_type(enable_svg_components=False,
     component_render_by_type_str = component_render_by_type_template.substitute(component_map_jsstr = component_map_jsstr,
                                                  component_import_jsstr = component_import_jsstr
                                                  )
-    write_to_bundler_dir(component_render_by_type_str , "src/ComponentRenderByType.svelte",
+    write_to_bundler_dir(component_render_by_type_str , "src/ComponentFactory.svelte.js",
                          target_bundler_dir = remote_svelte_bundle_dir
                          )
