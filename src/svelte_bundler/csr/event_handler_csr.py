@@ -28,17 +28,32 @@ function applyDiffPatch(diff_patch_json) {
     console.log(`component element <svelte-component id="${elementId}"> (DOM element not exposed)`);
   }
   const domDict = details.domDict || {};
-      // update classes
-if (domDict.hasOwnProperty('/classes')) {
-  // el.className = domDict["/classes"].trim();
-  console.log(`Update ignored classes for ${elementId}:`, el.className);
-} else if (domDict.hasOwnProperty('/text')) {
-  // el.innerText = domDict["/text"];
-  console.log(`Update ignore text for ${elementId}:`, el.innerText); // Fixed original typo here (changed classes to text)
-} else {
-// there should be more checks to see if this is for updateChartConfig
+// Loop through each key/value pair inside domDict
+for (const [key, value] of Object.entries(domDict)) {
+  
+  switch (key) {
+    case '/classes':
+      // compRef/el.className = value.trim();
+      console.log(`Update ignored classes for ${elementId}:`, el.className);
+      break;
 
+    case '/text':
+      // compRef/el.innerText = value;
+      console.log(`Update ignore text for ${elementId}:`, el.innerText);
+      break;
+
+    default:
+      // If the key is not explicitly '/classes' or '/text', treat it as a chart config update
+      if (isComponent && typeof compRef.update_chart_cfg === 'function') {
+        console.log(`Forwarding configuration update to chart [${key}]:`, value);
+        compRef.update_chart_cfg(key, value);
+      } else {
+        console.warn(`Unrecognized domDict property '${key}' for non-chart element ${elementId}`);
+      }
+      break;
+  }
 }
+
 
 
 
