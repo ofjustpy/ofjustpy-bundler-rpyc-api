@@ -80,6 +80,7 @@ def build_csr_svelte_bundle(target_module,
                             enable_skui_theme_selector = False, 
                             enable_inbrowser_exec=False,
                             deploy_websocket_manager=False,
+                            enable_fontawesome=True,
                             additional_skui_themes = []
                             ):
     # get the list of all shadcn and csr components used by the page 
@@ -164,7 +165,8 @@ window.set_skui_theme = set_skui_theme
 @import '@skeletonlabs/skeleton/themes/cerberus';
 @import '@skeletonlabs/skeleton/themes/mint';
 {additional_skui_themes_stmt}
-@source '../node_modules/@skeletonlabs/skeleton-svelte/dist';            
+@source '../node_modules/@skeletonlabs/skeleton-svelte/dist';
+            
 """
             skeleton_app_css ="""
   .preset-typo-body-1,
@@ -371,6 +373,26 @@ window.set_skui_theme = set_skui_theme
         """
         
         # TODO: {fontawesome_app_css_import_stmt}
+        #enable_fontawesome = False
+        fontawesome_app_css_import_stmt = ""
+        if res.num_fontawesome_components > 0:
+            enable_fontawesome = True
+        if enable_fontawesome:
+            fontawesome_app_css_import_stmt = """@import "@fortawesome/fontawesome-free/css/all.min.css";
+svg.svg-inline--fa {
+  display: inline-block;
+  height: 1em;
+  vertical-align: -.125em;
+}
+
+            
+"""
+            runtime_context.ssh_client_manager.exec_command("build bundle",
+                                        f"""cd {remote_svelte_bundle_dir}; export PATH={node_bin_path}:/home/kabiraatmonallabs/.local/share/pnpm:$PATH;
+                                        pnpm install @fortawesome/fontawesome-free
+""")
+                    
+            pass
         # testing to remove all shadcn directives
         shadcn_app_css = ""
         app_css_str = f"""
@@ -379,8 +401,9 @@ window.set_skui_theme = set_skui_theme
 @source inline("bg-tertiary-{50,100,200,300,400,500,600,700,800,900}");        
 {skeleton_ui_import}        
 @plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/forms'; 
 @source "safelist.txt";    
-
+{fontawesome_app_css_import_stmt}
 {skeleton_app_css}
 
 {shadcn_app_css}        

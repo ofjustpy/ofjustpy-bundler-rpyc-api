@@ -2,8 +2,8 @@
 <script lang="ts">
     export let jp_props;
     export let comp_ref;
-    import ComponentRenderByType from './ComponentRenderByType.svelte';
 
+import { componentsRegistry } from './ComponentFactory.svelte.js';
     $shadcn_component_import_stmt
 
     let components =  { $kv_label_to_shadcn_comp_map
@@ -22,7 +22,7 @@
 {#if jp_props.text}{jp_props.text}{/if}
   {#each jp_props.object_props as cobj_props}
     {#if cobj_props.show}
-      <svelte:component this={ComponentRenderByType} jp_props={cobj_props}/>
+      <svelte:component this={componentsRegistry[cobj_props.vue_type]}  jp_props={cobj_props}/>
     {/if}
   {/each}
 {#if jp_props.inner_html}{@html jp_props.inner_html}{/if}

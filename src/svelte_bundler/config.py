@@ -14,6 +14,6 @@ node_bin_path = "/home/kabiraatmonallabs/.nvm/versions/node/v25.3.0/bin/" #"/zpo
 # port=8181
 # hostname="49.205.196.82"
 port=22
-hostname="192.168.0.3"
+hostname="192.168.0.19"
 username="kabiraatmonallabs"
 remote_bundle_dir = ""

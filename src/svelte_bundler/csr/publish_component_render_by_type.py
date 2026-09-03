@@ -10,7 +10,7 @@ component_render_by_type_template = Template("""
    import Htmlcomponents from './Htmlcomponents.svelte';
    import PlainTextComponent from './PlainTextComponent.svelte';
    $component_import_jsstr
-   const componentsRegistry = { 'html_component': Htmlcomponents,
+   export const componentsRegistry = { 'html_component': Htmlcomponents,
                       'svg_component': SVGComponent,
                       'plaintext_component': PlainTextComponent,
                       $component_map_jsstr

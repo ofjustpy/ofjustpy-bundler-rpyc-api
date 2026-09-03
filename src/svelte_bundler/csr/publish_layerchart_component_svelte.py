@@ -14,7 +14,7 @@ import { BarChart } from 'layerchart';
 import './user_dataset.js';
     export let jp_props;
       let other_ref = null;
-  import ComponentRenderByType from './ComponentRenderByType.svelte';
+
     let components =  {
                           $kv_label_to_layerchart_comp_map
                        }

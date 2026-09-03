@@ -8,6 +8,7 @@ from ..config import (hostname,
 from ..helper_utils import write_to_bundler_dir
 
 setup_websocket_cjs = """
+import { applyDiffPatchImpl } from './csr_event_handler.js';
 export class WebSocketManager {
     constructor(pageId, options = {}) {
         // Critical Configuration
@@ -73,6 +74,7 @@ export class WebSocketManager {
         try {
             const msg = JSON.parse(event.data);
             console.log("msg = ", msg);
+            console.log("msg-type = ", msg.type);
             switch (msg.type) {
                 case 'page_update':
                     this.handlePageUpdateEvent(msg);
@@ -127,7 +129,8 @@ export class WebSocketManager {
     }
 
      handleDiffPatchUpdate(msg){
-        applyDiffPatch(msg);
+        console.log("calling applyDiffPatch from websockets");
+        applyDiffPatchImpl(msg);
     }
     handleWebsocketUpdateEvent(msg) {
         console.log("websocket update event recieved");

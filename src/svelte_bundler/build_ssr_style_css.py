@@ -193,6 +193,7 @@ svg.svg-inline--fa {
 @import "tailwindcss";
 {skeleton_ui_import}        
 @plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/forms';         
 @source "safelist.txt";    
 {fontawesome_app_css_import_stmt}
 {skeleton_app_css}        
