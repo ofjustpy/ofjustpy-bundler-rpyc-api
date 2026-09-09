@@ -41,6 +41,7 @@ from .event_handler_csr import ajax_event_handling
 from .publish_component_render_by_type import publish_component_render_by_type
 from .publish_lucide_icons_component_render_svelte import publish_lucide_icons_component_render_svelte
 from .publish_store_shadcn_bindvalue import publish_store_shadcn_bindvalue
+from .publish_store_shadcn_bindopen import publish_store_shadcn_bindopen
 # Get the directory of the current file
 current_dir = Path(__file__).parent.resolve()
 
@@ -92,7 +93,8 @@ def build_csr_svelte_bundle(target_module,
         # TODO: install the used shadcn components
         # the .json is actually a list
         write_to_bundler_dir(f"""export const scui_CSR_components = {[*page_csr_components.shadcn_components.json,
-        *page_csr_components.shadcn_bindvalue_components.json
+        *page_csr_components.shadcn_bindvalue_components.json,
+        *page_csr_components.shadcn_bindopen_components.json
         ]};""",
                              "src/scui_csr_components.js",
                              target_bundler_dir = remote_svelte_bundle_dir
@@ -160,12 +162,12 @@ window.set_skui_theme = set_skui_theme
         if res.use_skeleton_ui:
 
             skeleton_ui_import = f"""@import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/optional/presets';
+@import '@skeletonlabs/skeleton-svelte';            
 @import '@skeletonlabs/skeleton/themes/{res.skeleton_ui_theme}';
 @import '@skeletonlabs/skeleton/themes/cerberus';
 @import '@skeletonlabs/skeleton/themes/mint';
 {additional_skui_themes_stmt}
-@source '../node_modules/@skeletonlabs/skeleton-svelte/dist';
+
             
 """
             skeleton_app_css ="""
@@ -463,11 +465,26 @@ svg.svg-inline--fa {
 
         # ============================================================
         # =================== add shadcn components ==================
-        # ============================================================
         shadcn_component_install_stmt = ";".join([f"""pnpm dlx shadcn-svelte@latest add {_.lower()} --yes"""
-                                                  for _ in [*page_csr_components.shadcn_components.labels, *page_csr_components.shadcn_bindvalue_components.labels]
+                                                  for _ in [*page_csr_components.shadcn_components.labels, *page_csr_components.shadcn_bindvalue_components.labels, *page_csr_components.shadcn_bindopen_components.labels]
                                                   ]
                                                  )
+        # ============================================================
+ 
+        #. nested shadcn components like hovercard_trigger will end in shadcn component 
+        filter1 = [_ for _ in [
+            page_csr_components.shadcn_components.kv_label_to_shadcn_comp_map,
+            page_csr_components.shadcn_bindopen_components.kv_label_to_shadcn_comp_map,
+            page_csr_components.shadcn_bindvalue_components.kv_label_to_shadcn_comp_map,
+        ]
+                                                                  if len(_) > 0
+                                                                  ]
+        
+
+        kv_label_to_shadcn_comp_map = ",".join( filter1)
+        
+        print(kv_label_to_shadcn_comp_map)
+
 
         # ============================ end ===========================
 
@@ -477,12 +494,12 @@ svg.svg-inline--fa {
         # import * as {kebab_to_pascal(_)} from "$lib/components/ui/{_.lower()}/index.js";
         
         # """ for _ in page_csr_components.shadcn_components.labels])
-        shadcn_component_import_stmt = "\n".join(page_csr_components.shadcn_components.import_stmts
+        shadcn_component_import_stmt = "\n".join([*page_csr_components.shadcn_components.import_stmts, *page_csr_components.shadcn_bindopen_components.import_stmts]
         )
         
-        
-        kv_label_to_shadcn_comp_map = page_csr_components.shadcn_components.kv_label_to_shadcn_comp_map
-        
+
+
+
 
         # scr:shadcn_component_renderer
         scr_template = Template(Path(current_dir / 'ShadcnComponent.svelte.template').read_text(encoding='utf-8'))
@@ -522,9 +539,29 @@ svg.svg-inline--fa {
                              target_bundler_dir = remote_svelte_bundle_dir
                              )
 
+        publish_store_shadcn_bindvalue()
+        # ============== scr:shadcn_component bind open ==============
+        shadcn_bindopen_component_import_stmts = "\n".join(page_csr_components.shadcn_bindopen_components.import_stmts
+        )
+        
+        shadcn_bindopen_kv_label_to_shadcn_comp_map = page_csr_components.shadcn_bindopen_components.kv_label_to_shadcn_comp_map
+        scr_template = Template(Path(current_dir / 'ShadcnBindOpenComponent.svelte.template').read_text(encoding='utf-8'))
+        # cstr: code string
+        scr_cstr = scr_template.substitute(shadcn_component_import_stmts = shadcn_bindopen_component_import_stmts,
+                                          
+                                          kv_label_to_shadcn_comp_map = shadcn_bindopen_kv_label_to_shadcn_comp_map                           
+                                           )
+
+        
+        write_to_bundler_dir(scr_cstr,
+                             "src/ShadcnBindOpenComponent.svelte",
+                             target_bundler_dir = remote_svelte_bundle_dir
+                             )
+
+        
         #. build store_shadcn_bindvalue
 
-        publish_store_shadcn_bindvalue()
+        publish_store_shadcn_bindopen()
         # ============================ end ===========================
 
         
@@ -567,9 +604,12 @@ svg.svg-inline--fa {
         # =================== ComponentRenderByType ==================
         # TODO: enable_lucide_icons_components should come for twtags_safelist
         #. TODO:  enable_shadcn_bindvalue_components = False,
+        #. TODO:  enable_shadcn_bindopen_components = False,
         publish_component_render_by_type(enable_svg_components=True,
                                          enable_lucide_icons_components = True,
                                          enable_shadcn_bindvalue_components = True,
+                                         enable_shadcn_bindopen_components = True,
+                                         
                                          enable_shadcn_layerchart_components = enable_shadcn_layerchart_components,
                                          enable_chartjs_component=enable_chartjs_component
                                          )

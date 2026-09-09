@@ -49,6 +49,7 @@ def publish_component_render_by_type(enable_svg_components=False,
                                      enable_fontawesome_components = False,
                                      enable_shadcn_components = True,
                                      enable_shadcn_bindvalue_components = False,
+                                     enable_shadcn_bindopen_components = False,
                                      enable_skeleton_components = False,
                                      enable_lucide_icons_components = False,
                                      enable_shadcn_layerchart_components=False,
@@ -67,6 +68,10 @@ def publish_component_render_by_type(enable_svg_components=False,
     if enable_shadcn_bindvalue_components:
         component_map_stmts.append("'shadcnui_bindvalue_component': ShadcnComponentBindValue")
         component_import_stmts.append("import ShadcnComponentBindValue from './ShadcnBindValueComponent.svelte';")
+    if enable_shadcn_bindopen_components:
+        component_map_stmts.append("'shadcnui_bindopen_component': ShadcnComponentBindOpen")
+        
+        component_import_stmts.append("import ShadcnComponentBindOpen from './ShadcnBindOpenComponent.svelte';")
 
 
     if enable_lucide_icons_components:

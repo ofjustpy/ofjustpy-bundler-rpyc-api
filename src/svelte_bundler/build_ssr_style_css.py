@@ -98,13 +98,12 @@ svg.svg-inline--fa {
         if res.use_skeleton_ui:
 
             skeleton_ui_import = f"""@import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/optional/presets';
 @import '@skeletonlabs/skeleton/themes/{res.skeleton_ui_theme}';
 @import '@skeletonlabs/skeleton/themes/cerberus';
 @import '@skeletonlabs/skeleton/themes/mint';
 {additional_skui_themes_stmt}
+@import '@skeletonlabs/skeleton-svelte'; 
 
-@source '../node_modules/@skeletonlabs/skeleton-svelte/dist';            
 """
             skeleton_app_css ="""
   .preset-typo-body-1,

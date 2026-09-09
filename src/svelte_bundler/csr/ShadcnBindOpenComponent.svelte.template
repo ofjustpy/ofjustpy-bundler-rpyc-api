@@ -1,0 +1,76 @@
+<script lang="ts">
+  
+  import { componentValues } from './store_shadcn_bindvalue.ts';
+import { componentsRegistry } from './ComponentFactory.svelte.js';
+
+  $shadcn_component_import_stmts
+  let { jp_props, comp_ref } = $$props();
+  let other_ref = null;
+
+  let components =  {
+                        $kv_label_to_shadcn_comp_map
+                    }
+
+
+let cid = jp_props.id;
+console.log("cid = ", cid)
+let isOpen = $$state(false);
+
+// Event handler for open/close state transitions
+  function handleOpenChange(openState: boolean) {
+    isOpen = openState;
+    console.log(`HoverCard [$${cid}] open state changed:`, openState);
+    const triggerEl = document.getElementById(`$${cid}_trigger`);
+    if (triggerEl) {
+        triggerEl.classList.remove('opacity-100', 'opacity-10');
+        triggerEl.classList.add(openState ? 'opacity-10' : 'opacity-100');
+      } else {
+        console.warn(`HoverCard [$${cid}]: trigger element not found in DOM`);
+      }
+      
+
+    
+    if (openState) {
+      // Trigger open logic/telemetry here
+    } else {
+      // Trigger close logic/telemetry here
+    }
+  }
+
+
+
+
+
+let Component = components[jp_props.html_tag];
+
+let computedClasses = $$derived.by(() => {
+  const base = jp_props.classes ;
+
+  return `$${base} transition-opacity duration-200 $${isOpen ? 'opacity-10' : 'opacity-0'}`.trim();
+});
+
+//let descriptionObject = {
+//    ...jp_props.attrs,
+//    style: jp_props.style,
+//    class: `$${jp_props.classes ?? ''} transition-opacity duration-200 $${isOpen ? 'opacity-10' : 'opacity-0'}`.trim(),
+//    onOpenChange: handleOpenChange
+//
+//  };
+
+let descriptionObject = $$derived({
+  ...jp_props.attrs,
+  style: jp_props.style,
+  class: computedClasses,
+  onOpenChange: handleOpenChange
+});
+
+</script>
+<Component  {...descriptionObject} bind:value={isOpen} bind:this={other_ref}>
+{#if jp_props.text}{jp_props.text}{/if}
+  {#each jp_props.object_props as cobj_props}
+    {#if cobj_props.show}
+      <svelte:component this={componentsRegistry[cobj_props.vue_type]}                      jp_props={cobj_props}/>
+    {/if}
+  {/each}
+{#if jp_props.inner_html}{@html jp_props.inner_html}{/if}
+</Component>
