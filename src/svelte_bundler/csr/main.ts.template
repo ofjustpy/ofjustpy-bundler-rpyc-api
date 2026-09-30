@@ -1,4 +1,5 @@
 import { mount } from 'svelte';
+import { DomEditApplier } from './DomEdit.js';
 $skeleton_theme_selector_stmt
 $import_websocket_manager_stmt
 $csr_event_handler_stmt

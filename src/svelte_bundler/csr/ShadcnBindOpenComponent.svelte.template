@@ -11,21 +11,25 @@ import { componentsRegistry } from './ComponentFactory.svelte.js';
                         $kv_label_to_shadcn_comp_map
                     }
 
-
+console.log("shadcn hovercard compoment jp_props ", jp_props);
 let cid = jp_props.id;
 console.log("cid = ", cid)
 let isOpen = $$state(false);
-
+//target that needs to be dimmed on hovercard open 
+let target_cid =jp_props.on_open_fade_target_id // "/modify_space_grid" //`$${cid}_trigger`
 // Event handler for open/close state transitions
   function handleOpenChange(openState: boolean) {
     isOpen = openState;
     console.log(`HoverCard [$${cid}] open state changed:`, openState);
-    const triggerEl = document.getElementById(`$${cid}_trigger`);
+    if (jp_props?.on_open_fade_target_id) {
+    const target_cid = jp_props.on_open_fade_target_id;
+    const triggerEl = document.getElementById(target_cid);
     if (triggerEl) {
         triggerEl.classList.remove('opacity-100', 'opacity-10');
         triggerEl.classList.add(openState ? 'opacity-10' : 'opacity-100');
       } else {
-        console.warn(`HoverCard [$${cid}]: trigger element not found in DOM`);
+        console.warn(`$${target_cid}:  element not found in DOM`);
+      }
       }
       
 

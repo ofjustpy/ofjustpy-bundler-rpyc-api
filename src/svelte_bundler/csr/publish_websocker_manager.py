@@ -9,6 +9,8 @@ from ..helper_utils import write_to_bundler_dir
 
 setup_websocket_cjs = """
 import { applyDiffPatchImpl } from './csr_event_handler.js';
+import { DomEditApplier } from './DomEdit';
+
 export class WebSocketManager {
     constructor(pageId, options = {}) {
         // Critical Configuration
@@ -35,9 +37,10 @@ export class WebSocketManager {
 
         // Outbound Message Queue
         this.messageQueue = [];
-
+        this.domEditApplier = new DomEditApplier();
         // Auto-initialize connection
         this.initConnection();
+
     }
 
     initConnection() {
@@ -89,6 +92,9 @@ export class WebSocketManager {
                 case 'run_javascript':
                     this.handleRunJavascriptEvent(msg);
                     break;
+                case 'dom_edit':
+                    this.handleDomEditEvent(msg);
+                    break;  
                 default:
                     if (this.debug) {
                         console.warn(`Message type "${msg.type}" has no registered handler`);
@@ -98,6 +104,12 @@ export class WebSocketManager {
             if (this.debug) console.error("Failed to parse incoming WS message:", err);
         }
     }
+    handleDomEditEvent(msg){
+     console.log("got msg for domEdit");
+     console.log(msg);
+     this.domEditApplier.apply(msg.edit_log );
+
+   }
 
     handlePageUpdateEvent(msg) {
         const options = msg.page_options || {};

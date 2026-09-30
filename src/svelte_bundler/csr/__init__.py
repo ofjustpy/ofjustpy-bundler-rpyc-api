@@ -82,6 +82,7 @@ def build_csr_svelte_bundle(target_module,
                             enable_inbrowser_exec=False,
                             deploy_websocket_manager=False,
                             enable_fontawesome=True,
+                            enable_edit_dom = False, 
                             additional_skui_themes = []
                             ):
     # get the list of all shadcn and csr components used by the page 
@@ -483,8 +484,6 @@ svg.svg-inline--fa {
 
         kv_label_to_shadcn_comp_map = ",".join( filter1)
         
-        print(kv_label_to_shadcn_comp_map)
-
 
         # ============================ end ===========================
 
@@ -544,15 +543,17 @@ svg.svg-inline--fa {
         shadcn_bindopen_component_import_stmts = "\n".join(page_csr_components.shadcn_bindopen_components.import_stmts
         )
         
-        shadcn_bindopen_kv_label_to_shadcn_comp_map = page_csr_components.shadcn_bindopen_components.kv_label_to_shadcn_comp_map
+        
         scr_template = Template(Path(current_dir / 'ShadcnBindOpenComponent.svelte.template').read_text(encoding='utf-8'))
         # cstr: code string
         scr_cstr = scr_template.substitute(shadcn_component_import_stmts = shadcn_bindopen_component_import_stmts,
                                           
-                                          kv_label_to_shadcn_comp_map = shadcn_bindopen_kv_label_to_shadcn_comp_map                           
+                                          kv_label_to_shadcn_comp_map = page_csr_components.shadcn_bindopen_components.kv_label_to_shadcn_comp_map                           
                                            )
-
+        print("debug bindopen = ", page_csr_components.shadcn_bindopen_components.kv_label_to_shadcn_comp_map)
         
+
+        print("write to bundler for bindopen = ", scr_cstr)
         write_to_bundler_dir(scr_cstr,
                              "src/ShadcnBindOpenComponent.svelte",
                              target_bundler_dir = remote_svelte_bundle_dir
@@ -644,5 +645,10 @@ svg.svg-inline--fa {
         publish_websocket_manager()
 
         # ============================ end ===========================
+
+        # ========================= dom edit =========================
+        from .publish_edit_dom import publish_dom_edit_jssvelte
+        if enable_edit_dom:
+            publish_dom_edit_jssvelte() 
         build_and_fetch_bundle(res.svelte_bundle_dir, shadcn_component_install_stmt, install_chartjs=install_chartjs)
         pass
