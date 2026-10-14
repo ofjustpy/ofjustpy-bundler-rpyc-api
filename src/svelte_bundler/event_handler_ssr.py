@@ -177,8 +177,8 @@ async function sendEventAjax(e) {
 }
 async function eventHandler(e) {
   // prevent default if needed
-  // e.preventDefault();
-  const el = event.currentTarget;
+  e.preventDefault();
+  const el = e.currentTarget;
   console.log("Current Target ID:", el.id);
   await sendEventAjax(e);
 }
