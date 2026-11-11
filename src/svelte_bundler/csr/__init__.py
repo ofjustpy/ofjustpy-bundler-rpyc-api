@@ -104,6 +104,16 @@ def build_csr_svelte_bundle(target_module,
         # TODO: install the used csr components
 
         # ============================ end ===========================
+        # ==================== skeleton components ===================
+        write_to_bundler_dir(f"""export const skui_CSR_components = {[*page_csr_components.skeleton_components.json,
+        ]};""",
+                             "src/skui_csr_components.js",
+                             target_bundler_dir = remote_svelte_bundle_dir
+
+                             )
+        
+
+        # ============================ end ===========================
 
         # ============= write json for lucide components =============
         # we don't need lucide_csr_icons.js
@@ -471,6 +481,7 @@ svg.svg-inline--fa {
                                                   ]
                                                  )
         # ============================================================
+        # no need to install skeleton components 
  
         #. nested shadcn components like hovercard_trigger will end in shadcn component 
         filter1 = [_ for _ in [
@@ -515,6 +526,42 @@ svg.svg-inline--fa {
                              )
         # ============================ end ===========================
 
+        # ======== prepare and write SkeletonComponent.svelte ========
+        enable_skeleton_components = False
+        if len(page_csr_components.skeleton_components.labels) > 0:
+            print("enabling skeleton components ")
+            enable_skeleton_components = True 
+        skeleton_component_import_stmt = "\n".join([*page_csr_components.skeleton_components.import_stmts]
+        )
+
+        filter1 = [_ for _ in [
+            page_csr_components.skeleton_components.kv_label_to_skeleton_comp_map,
+            #page_csr_components.shadcn_bindopen_components.kv_label_to_shadcn_comp_map, #TODO
+            #page_csr_components.shadcn_bindvalue_components.kv_label_to_shadcn_comp_map, #TODO 
+        ]
+                                                                  if len(_) > 0
+                                                                  ]
+        print(filter1)
+
+        kv_label_to_skeleton_comp_map = ",".join( filter1)
+        
+        scr_template = Template(Path(current_dir / 'SkeletonComponent.svelte.template').read_text(encoding='utf-8'))
+        # cstr: code string
+        scr_cstr = scr_template.substitute(skeleton_component_import_stmt = skeleton_component_import_stmt,
+                                          
+                                          kv_label_to_skeleton_comp_map = kv_label_to_skeleton_comp_map                           
+                                           )
+
+        
+        write_to_bundler_dir(scr_cstr,
+                             "src/SkeletonComponent.svelte",
+                             target_bundler_dir = remote_svelte_bundle_dir
+                             )
+
+        # ============================ end ===========================
+
+
+        
         # ============== prepare ShadcnComponentBindValue.svelte ==============
 
         shadcn_bindvalue_component_import_stmts = "\n".join(page_csr_components.shadcn_bindvalue_components.import_stmts
@@ -610,7 +657,7 @@ svg.svg-inline--fa {
                                          enable_lucide_icons_components = True,
                                          enable_shadcn_bindvalue_components = True,
                                          enable_shadcn_bindopen_components = True,
-                                         
+                                         enable_skeleton_components = enable_skeleton_components, 
                                          enable_shadcn_layerchart_components = enable_shadcn_layerchart_components,
                                          enable_chartjs_component=enable_chartjs_component
                                          )

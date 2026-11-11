@@ -1,0 +1,57 @@
+<script lang="ts">
+import { onMount } from 'svelte';
+
+    let { jp_props = {}, comp_ref = {} } = $$props();
+     import { componentsRegistry } from './ComponentFactory.svelte.js';
+    $skeleton_component_import_stmt
+
+    let components =  { $kv_label_to_skeleton_comp_map
+
+                       }
+
+
+
+function handleEvent(e) {
+    if (e.type === 'submit') {
+      e.preventDefault();
+    }
+
+    if (jp_props.events?.includes(e.type)) {
+      eventHandler(e);
+    }
+  }
+
+
+const Component = $$derived(components[jp_props.html_tag]);
+console.log("mounting skeleton component");
+console.log(Component);
+
+     let descriptionObject = $$derived.by(() => {
+    return {...jp_props.attrs,
+    style: jp_props.style,
+    class: jp_props.classes,
+    }
+  });  
+</script>
+
+<Component 
+       {...descriptionObject}
+onclick={handleEvent}
+    onchange={handleEvent}
+    onsubmit={handleEvent}
+    onmouseover={handleEvent}
+    onmouseenter={handleEvent}
+    onmouseleave={handleEvent}
+    onmouseout={handleEvent}
+    ondblclick={handleEvent}>
+{#if jp_props.text}{jp_props.text}{/if}
+  {#each jp_props.object_props as cobj_props}
+    {#if cobj_props.show}
+      <svelte:component this={componentsRegistry[cobj_props.vue_type]}  jp_props={cobj_props}/>
+    {/if}
+  {/each}
+{#if jp_props.inner_html}{@html jp_props.inner_html}{/if}
+  </Component>
+
+
+ 

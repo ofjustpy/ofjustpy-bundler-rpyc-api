@@ -86,7 +86,10 @@ def publish_component_render_by_type(enable_svg_components=False,
         component_map_stmts.append("'chartjs_component' : ChartJS")
         component_import_stmts.append("import ChartJS from './ChartJSComponent.svelte';")
                 
-    
+    if enable_skeleton_components:
+        component_map_stmts.append("'skeletonui_component' : SkeletonComponent")
+        component_import_stmts.append("import SkeletonComponent from './SkeletonComponent.svelte';")
+                
         
     component_import_jsstr = "\n".join(component_import_stmts)
     component_map_jsstr = ",\n".join(component_map_stmts)
