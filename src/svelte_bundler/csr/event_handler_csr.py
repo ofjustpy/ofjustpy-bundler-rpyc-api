@@ -116,17 +116,23 @@ async function sendEventAjax(e) {
   };
 
   async function handleResponse(resp) {
-    if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
-    const result = await resp.json();
-  // Handle redirect directive if present
-  if (result.redirect_to_url) {
-    window.location.href = result.redirect_to_url;
-    // Optional: Return a promise that never resolves to stop further execution 
-    // while the browser handles the page tear-down/load.
-    return new Promise(() => {});
+    console.log("Handle response");
+    if (!resp.ok) {console.log("response not oke");
+      throw new Error(`HTTP error ${resp.status}`);
   }
 
+    const result = await resp.json();
+  // Handle redirect directive if present
+   if (result.redirect_to_url) {
+  //  console.log("redirect issued");
+     window.location.href = result.redirect_to_url;
+     // Optional: Return a promise that never resolves to stop further execution 
+     // while the browser handles the page tear-down/load.
+     return new Promise(() => {});
+   }
+
     if (result.diff_patch) {
+    //console.log("apply diff patch");
     applyDiffPatch(result.diff_patch);
    }
 
@@ -147,6 +153,7 @@ async function sendEventAjax(e) {
   }
       try {
     const resp = await doFetch();
+    //console.log("fetch done");
     await handleResponse(resp);
   } catch (err) {
     console.warn("Initial AJAX send failed, retrying...", err);
@@ -176,7 +183,7 @@ function eventHandler(e) {
   if (!element) return;
 
   const eventType = e.type;
-
+  e.preventDefault();
   // Handle Mouse Enter / Mouse Over (Hover Rest Detection)
   if (eventType === 'mouseenter' || eventType === 'mouseover') {
       e.stopPropagation();
